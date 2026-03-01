@@ -52,7 +52,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         >
           {/* Item Description (fixed area) */}
           <div
-            className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden"
+            className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center"
             style={{
               height: `${height * descAreaRatio * scale}px`,
               fontSize: `${titleFontSize * scale}px`,
