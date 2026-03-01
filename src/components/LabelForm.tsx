@@ -86,17 +86,16 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
 
         {/* Qty (only for box template) */}
         {data.template === 'box' && (
-          <div className="flex-1 space-y-3">
-            {/* Where label is applied */}
-            <div className="space-y-1.5">
-              <Label className="text-sm font-medium">
-                {t(lang, 'qtyTypeHint')}
-              </Label>
+          <div className="flex-1 space-y-1.5">
+            <Label className="text-sm font-medium">
+              {t(lang, 'qtyTypeHint')}
+            </Label>
+            <div className="flex items-center gap-2">
               <Select
                 value={data.qtyType ?? 'box'}
                 onValueChange={(v) => onChange({ qtyType: v as QtyType })}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -105,12 +104,6 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   <SelectItem value="set">{t(lang, 'setQty')}</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            {/* Quantity */}
-            <div className="space-y-1.5">
-              <Label htmlFor="boxQty" className="text-sm font-medium">
-                {t(lang, 'qtyType')}
-              </Label>
               <Input
                 id="boxQty"
                 value={data.boxQty ?? ''}
@@ -119,10 +112,10 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onChange({ boxQty: v ? parseInt(v) : undefined });
                 }}
                 placeholder={t(lang, 'boxQtyHint')}
-                className={`font-mono text-sm w-24 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                className={`font-mono text-sm w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               />
-              {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
             </div>
+            {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
           </div>
         )}
       </div>
