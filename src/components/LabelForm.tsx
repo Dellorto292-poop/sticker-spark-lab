@@ -34,7 +34,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           placeholder={t(lang, 'itemDescriptionHint')}
           rows={2}
           maxLength={150}
-          className="resize-none font-mono text-sm"
+          className={`resize-none font-mono text-sm ${!data.itemDescription.trim() ? 'border-destructive focus-visible:ring-destructive' : ''}`}
         />
         {errors.itemDescription && (
           <p className="text-xs text-destructive">{errors.itemDescription}</p>
@@ -54,7 +54,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             onChange({ sku: v });
           }}
           placeholder={t(lang, 'skuHint')}
-          className="font-mono text-sm"
+          className={`font-mono text-sm ${!data.sku ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           maxLength={12}
         />
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
@@ -73,7 +73,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             onChange({ revision: v });
           }}
           placeholder="00"
-          className="font-mono text-sm w-24"
+          className={`font-mono text-sm w-24 ${!data.revision ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           maxLength={2}
         />
         {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
@@ -112,7 +112,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             value={data.boxQty ?? ''}
             onChange={(e) => onChange({ boxQty: e.target.value ? parseInt(e.target.value) : undefined })}
             placeholder={t(lang, 'boxQtyHint')}
-            className="font-mono text-sm w-28"
+            className={`font-mono text-sm w-28 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           />
           {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
         </div>
