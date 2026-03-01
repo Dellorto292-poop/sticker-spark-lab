@@ -60,8 +60,8 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               display: '-webkit-box',
               WebkitLineClamp: descMaxLines,
               WebkitBoxOrient: 'vertical',
-              overflowWrap: 'anywhere',
-              wordBreak: 'break-all',
+              overflowWrap: 'break-word',
+              wordBreak: 'normal',
             }}
           >
             {data.itemDescription || '—'}
