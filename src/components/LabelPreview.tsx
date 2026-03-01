@@ -26,8 +26,8 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const scaledH = height * scale;
 
   const fontSize = Math.max(height * 0.08, 2);
-  const descAreaRatio = 0.28;
-  const tableAreaRatio = 0.14;
+  const descAreaRatio = 0.24;
+  const tableAreaRatio = 0.12;
   const descMaxLines = 3;
 
   // Keep description strictly inside fixed top area
@@ -52,7 +52,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         >
           {/* Item Description (fixed area) */}
           <div
-            className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center"
+            className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center border-b border-black"
             style={{
               height: `${height * descAreaRatio * scale}px`,
               fontSize: `${titleFontSize * scale}px`,
@@ -95,29 +95,29 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           {/* Table at bottom */}
           <div
             className="absolute bottom-0 left-0 right-0 border-t-2 border-black flex"
-            style={{ height: `${height * 0.14 * scale}px` }}
+            style={{ height: `${height * 0.12 * scale}px` }}
           >
             {/* SKU column */}
-            <div className="flex-1 border-r border-black flex items-center px-[4%] gap-[4%]">
-              <div className="uppercase font-medium whitespace-nowrap" style={{ fontSize: `${fontSize * scale * 0.6}px` }}>SKU</div>
-              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.9}px` }}>
+            <div className="flex-1 border-r border-black flex items-center px-[3%]">
+              <div className="uppercase font-medium whitespace-nowrap border-r border-black pr-[6%] mr-[6%]" style={{ fontSize: `${fontSize * scale * 0.55}px` }}>SKU</div>
+              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
                 {data.sku || '—'}
               </div>
             </div>
             {/* Rev column */}
-            <div className={`flex-1 ${data.template === 'box' ? 'border-r border-black' : ''} flex items-center gap-[4%] px-[4%]`}>
-              <div className="uppercase font-medium whitespace-nowrap" style={{ fontSize: `${fontSize * scale * 0.6}px` }}>Rev.</div>
-              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.9}px` }}>
+            <div className={`flex-1 ${data.template === 'box' ? 'border-r border-black' : ''} flex items-center px-[3%]`}>
+              <div className="uppercase font-medium whitespace-nowrap border-r border-black pr-[6%] mr-[6%]" style={{ fontSize: `${fontSize * scale * 0.55}px` }}>Rev.</div>
+              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
                 {data.revision || '—'}
               </div>
             </div>
             {/* Box Qty column (only for box template) */}
             {data.template === 'box' && (
-              <div className="flex-1 flex items-center gap-[4%] px-[4%]">
-                <div className="uppercase font-medium whitespace-nowrap" style={{ fontSize: `${fontSize * scale * 0.6}px` }}>
+              <div className="flex-1 flex items-center px-[3%]">
+                <div className="uppercase font-medium whitespace-nowrap border-r border-black pr-[6%] mr-[6%]" style={{ fontSize: `${fontSize * scale * 0.55}px` }}>
                   {data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty'}
                 </div>
-                <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.9}px` }}>
+                <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
                   {data.boxQty ?? '—'}
                 </div>
               </div>
