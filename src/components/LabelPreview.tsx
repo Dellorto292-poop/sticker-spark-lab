@@ -143,7 +143,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
       </div>
 
-      <div className="text-xs text-muted-foreground font-mono">
+      <div className="text-xs text-muted-foreground font-mono font-bold">
         {width}×{height} мм · {data.barcodeType === 'code128' ? 'Code 128' : 'Code 39'}
       </div>
     </div>
