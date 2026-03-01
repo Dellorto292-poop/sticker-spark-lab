@@ -7,7 +7,7 @@ const translations = {
     selectTemplate: 'Выберите шаблон',
     unitLabel: 'Маркировка единицы',
     unitLabelDesc: 'Индивидуальная единица продукта',
-    boxLabel: 'Маркировка короба/палеты',
+    boxLabel: 'Маркировка короба/палеты/сета',
     boxLabelDesc: 'Короб, палета или сет',
     itemDescription: 'Наименование',
     itemDescriptionHint: 'Введите наименование из Oracle',

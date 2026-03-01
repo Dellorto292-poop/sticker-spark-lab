@@ -15,6 +15,13 @@ export const SIZE_PRESETS: LabelSize[] = [
   { name: '60×30 мм', width: 60, height: 30 },
 ];
 
+export const SIZE_PRESETS_BOX: LabelSize[] = [
+  { name: '40×20 мм', width: 40, height: 20 },
+  { name: '50×25 мм', width: 50, height: 25 },
+  { name: '60×30 мм', width: 60, height: 30 },
+  { name: 'A4 (210×297 мм)', width: 210, height: 297 },
+];
+
 export const DEFAULT_SKU_REGEX = '^[A-Z0-9]+$';
 
 export interface LabelData {

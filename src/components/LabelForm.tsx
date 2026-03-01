@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { LabelData, QtyType } from '@/lib/label-types';
-import { SIZE_PRESETS } from '@/lib/label-types';
+import { SIZE_PRESETS, SIZE_PRESETS_BOX } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
 
 interface Props {
@@ -14,7 +14,8 @@ interface Props {
 }
 
 export default function LabelForm({ data, onChange, lang, errors }: Props) {
-  const sizePresetKey = SIZE_PRESETS.find(
+  const presets = data.template === 'box' ? SIZE_PRESETS_BOX : SIZE_PRESETS;
+  const sizePresetKey = presets.find(
     (p) => p.width === data.size.width && p.height === data.size.height
   )
     ? `${data.size.width}x${data.size.height}`
@@ -146,7 +147,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {SIZE_PRESETS.map((p) => (
+              {presets.map((p) => (
                 <SelectItem key={`${p.width}x${p.height}`} value={`${p.width}x${p.height}`}>
                   {p.name}
                 </SelectItem>
