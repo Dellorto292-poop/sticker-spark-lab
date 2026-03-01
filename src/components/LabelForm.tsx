@@ -86,38 +86,42 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
 
         {/* Qty (only for box template) */}
         {data.template === 'box' && (
-          <div className="flex-1 space-y-1.5">
-            <Label className="text-sm font-medium">
-              {t(lang, 'qtyTypeHint')}
-            </Label>
-            <Select
-              value={data.qtyType ?? 'box'}
-              onValueChange={(v) => onChange({ qtyType: v as QtyType })}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="box">{t(lang, 'boxQty')}</SelectItem>
-                <SelectItem value="pallet">{t(lang, 'palletQty')}</SelectItem>
-                <SelectItem value="set">{t(lang, 'setQty')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Label htmlFor="boxQty" className="text-sm font-medium pt-1 block">
-              {t(lang, 'qtyType')}
-            </Label>
-            <Input
-              id="boxQty"
-              value={data.boxQty ?? ''}
-              onChange={(e) => {
-                const v = e.target.value.replace(/\D/g, '').slice(0, 6);
-                onChange({ boxQty: v ? parseInt(v) : undefined });
-              }}
-              placeholder={t(lang, 'boxQtyHint')}
-              className={`font-mono text-sm w-24 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-            />
-            {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
-          </div>
+          <>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">
+                {t(lang, 'qtyTypeHint')}
+              </Label>
+              <Select
+                value={data.qtyType ?? 'box'}
+                onValueChange={(v) => onChange({ qtyType: v as QtyType })}
+              >
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="box">{t(lang, 'boxQty')}</SelectItem>
+                  <SelectItem value="pallet">{t(lang, 'palletQty')}</SelectItem>
+                  <SelectItem value="set">{t(lang, 'setQty')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5 shrink-0">
+              <Label htmlFor="boxQty" className="text-sm font-medium">
+                {t(lang, 'qtyType')}
+              </Label>
+              <Input
+                id="boxQty"
+                value={data.boxQty ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  onChange({ boxQty: v ? parseInt(v) : undefined });
+                }}
+                placeholder={t(lang, 'boxQtyHint')}
+                className={`font-mono text-sm w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+              />
+              {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
+            </div>
+          </>
         )}
       </div>
 
