@@ -1,14 +1,339 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useRef, useCallback } from 'react';
+import { toPng } from 'html-to-image';
+import { jsPDF } from 'jspdf';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import LabelForm from '@/components/LabelForm';
+import LabelPreview from '@/components/LabelPreview';
+import HistoryPanel from '@/components/HistoryPanel';
+import { t, type Lang } from '@/lib/i18n';
+import { generateZpl } from '@/lib/zpl';
+import { addToHistory } from '@/lib/history';
+import type { LabelData, TemplateType } from '@/lib/label-types';
+import { generateId } from '@/lib/label-types';
+import {
+  Printer, Download, FileText, FileImage, Code, Package, Box,
+  ArrowLeft, Languages, Eye
+} from 'lucide-react';
 
-const Index = () => {
+function createDefaultData(template: TemplateType): LabelData {
+  return {
+    id: generateId(),
+    template,
+    itemDescription: '',
+    sku: '',
+    revision: '',
+    boxQty: template === 'box' ? 1 : undefined,
+    barcodeType: 'code128',
+    size: { width: 60, height: 30 },
+    dpi: 203,
+    createdAt: Date.now(),
+  };
+}
+
+export default function Index() {
+  const [lang, setLang] = useState<Lang>('ru');
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(null);
+  const [data, setData] = useState<LabelData>(createDefaultData('unit'));
+  const [showAnnotations, setShowAnnotations] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [historyRefresh, setHistoryRefresh] = useState(0);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  const handleChange = useCallback((partial: Partial<LabelData>) => {
+    setData((prev) => ({ ...prev, ...partial }));
+    // Clear errors for changed fields
+    const keys = Object.keys(partial);
+    setErrors((prev) => {
+      const next = { ...prev };
+      keys.forEach((k) => delete next[k]);
+      return next;
+    });
+  }, []);
+
+  const validate = (): boolean => {
+    const errs: Record<string, string> = {};
+    if (!data.itemDescription.trim()) errs.itemDescription = t(lang, 'required');
+    if (!data.sku.trim()) errs.sku = t(lang, 'required');
+    else if (!/^[A-Za-z0-9\-_.]+$/.test(data.sku)) errs.sku = t(lang, 'invalidSku');
+    if (!data.revision.trim()) errs.revision = t(lang, 'required');
+    else if (data.revision.length < 2) errs.revision = t(lang, 'invalidRevision');
+    if (data.template === 'box') {
+      if (!data.boxQty || data.boxQty < 1 || !Number.isInteger(data.boxQty))
+        errs.boxQty = t(lang, 'invalidQty');
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleExport = async (type: 'pdf' | 'png' | 'zpl' | 'zpl-copy' | 'print') => {
+    if (type !== 'print' && !validate()) return;
+
+    // Save to history
+    const entry = { ...data, id: generateId(), createdAt: Date.now() };
+    addToHistory(entry);
+    setHistoryRefresh((n) => n + 1);
+
+    if (type === 'print') {
+      window.print();
+      return;
+    }
+
+    if (type === 'zpl' || type === 'zpl-copy') {
+      const zpl = generateZpl(data);
+      if (type === 'zpl-copy') {
+        await navigator.clipboard.writeText(zpl);
+        toast.success(t(lang, 'zplCopied'));
+      } else {
+        const blob = new Blob([zpl], { type: 'text/plain' });
+        downloadBlob(blob, `${data.sku || 'label'}.zpl`);
+      }
+      return;
+    }
+
+    if (!previewRef.current) return;
+
+    try {
+      const dataUrl = await toPng(previewRef.current, {
+        pixelRatio: data.dpi === 300 ? 4 : 3,
+        backgroundColor: '#ffffff',
+      });
+
+      if (type === 'png') {
+        const link = document.createElement('a');
+        link.download = `${data.sku || 'label'}.png`;
+        link.href = dataUrl;
+        link.click();
+      } else if (type === 'pdf') {
+        const img = new Image();
+        img.src = dataUrl;
+        await new Promise((r) => (img.onload = r));
+
+        const pdf = new jsPDF({
+          orientation: data.size.width > data.size.height ? 'landscape' : 'portrait',
+          unit: 'mm',
+          format: [data.size.width, data.size.height],
+        });
+        pdf.addImage(dataUrl, 'PNG', 0, 0, data.size.width, data.size.height);
+        pdf.save(`${data.sku || 'label'}.pdf`);
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+    }
+  };
+
+  function downloadBlob(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const handleRepeat = (item: LabelData) => {
+    if (item.sku) {
+      setData({ ...item, id: generateId(), createdAt: Date.now() });
+      setSelectedTemplate(item.template);
+    }
+    setHistoryRefresh((n) => n + 1);
+  };
+
+  const selectTemplate = (tmpl: TemplateType) => {
+    setSelectedTemplate(tmpl);
+    setData(createDefaultData(tmpl));
+    setErrors({});
+  };
+
+  // Template selection screen
+  if (!selectedTemplate) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Header */}
+        <header className="border-b border-border bg-card">
+          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <Package className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="font-bold text-lg leading-none">{t(lang, 'appTitle')}</h1>
+                <p className="text-xs text-muted-foreground">{t(lang, 'appSubtitle')}</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}
+              className="font-mono text-xs"
+            >
+              <Languages className="w-3.5 h-3.5 mr-1.5" />
+              {lang === 'ru' ? 'EN' : 'RU'}
+            </Button>
+          </div>
+        </header>
+
+        {/* Template selection */}
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="max-w-lg w-full space-y-6">
+            <h2 className="text-xl font-semibold text-center">{t(lang, 'selectTemplate')}</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => selectTemplate('unit')}
+                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left space-y-3"
+              >
+                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Package className="w-5 h-5 text-secondary-foreground group-hover:text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm">{t(lang, 'unitLabel')}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{t(lang, 'unitLabelDesc')}</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => selectTemplate('box')}
+                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left space-y-3"
+              >
+                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Box className="w-5 h-5 text-secondary-foreground group-hover:text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm">{t(lang, 'boxLabel')}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{t(lang, 'boxLabelDesc')}</p>
+                </div>
+              </button>
+            </div>
+
+            {/* History below */}
+            <div className="pt-4 border-t border-border">
+              <HistoryPanel lang={lang} onRepeat={handleRepeat} refreshKey={historyRefresh} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Editor screen
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="border-b border-border bg-card">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => setSelectedTemplate(null)}>
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              {t(lang, 'back')}
+            </Button>
+            <div className="h-5 w-px bg-border" />
+            <div className="flex items-center gap-2">
+              {data.template === 'unit' ? (
+                <Package className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Box className="w-4 h-4 text-muted-foreground" />
+              )}
+              <span className="font-semibold text-sm">
+                {data.template === 'unit' ? t(lang, 'unitLabel') : t(lang, 'boxLabel')}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+              <Label htmlFor="annotations" className="text-xs text-muted-foreground cursor-pointer">
+                {t(lang, 'annotations')}
+              </Label>
+              <Switch
+                id="annotations"
+                checked={showAnnotations}
+                onCheckedChange={setShowAnnotations}
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}
+              className="font-mono text-xs"
+            >
+              <Languages className="w-3.5 h-3.5 mr-1.5" />
+              {lang === 'ru' ? 'EN' : 'RU'}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left: Form */}
+          <div className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-5">
+              <LabelForm data={data} onChange={handleChange} lang={lang} errors={errors} />
+            </div>
+
+            {/* History */}
+            <div className="bg-card border border-border rounded-xl p-5">
+              <HistoryPanel lang={lang} onRepeat={handleRepeat} refreshKey={historyRefresh} />
+            </div>
+          </div>
+
+          {/* Right: Preview & Actions */}
+          <div className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-5">
+              <h3 className="text-sm font-semibold mb-4">{t(lang, 'preview')}</h3>
+              <div className="flex items-center justify-center min-h-[200px] bg-muted/30 rounded-lg p-6">
+                <LabelPreview ref={previewRef} data={data} showAnnotations={showAnnotations} />
+              </div>
+            </div>
+
+            {/* Export buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={() => handleExport('print')}
+                variant="outline"
+                className="h-11"
+              >
+                <Printer className="w-4 h-4 mr-2" />
+                {t(lang, 'print')}
+              </Button>
+              <Button
+                onClick={() => handleExport('pdf')}
+                className="h-11"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                {t(lang, 'downloadPdf')}
+              </Button>
+              <Button
+                onClick={() => handleExport('png')}
+                variant="outline"
+                className="h-11"
+              >
+                <FileImage className="w-4 h-4 mr-2" />
+                {t(lang, 'downloadPng')}
+              </Button>
+              <Button
+                onClick={() => handleExport('zpl-copy')}
+                variant="outline"
+                className="h-11"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                {t(lang, 'copyZpl')}
+              </Button>
+              <Button
+                onClick={() => handleExport('zpl')}
+                variant="outline"
+                className="h-11 col-span-2"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {t(lang, 'downloadZpl')}
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Index;
+}
