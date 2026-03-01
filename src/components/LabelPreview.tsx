@@ -25,7 +25,15 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
   const scaledH = height * scale;
 
   const fontSize = Math.max(height * 0.08, 2);
-  const titleFontSize = Math.max(height * 0.1, 2.5);
+
+  // Dynamic title font: shrink to fit within 30% of label height
+  const descLen = data.itemDescription.length || 1;
+  const charsPerLine = Math.max(Math.floor(width / (height * 0.06)), 10);
+  const lines = Math.ceil(descLen / charsPerLine);
+  const availableH = height * 0.28;
+  const maxFontByHeight = availableH / (lines * 1.3); // 1.3 = line-height
+  const baseTitleFont = Math.max(height * 0.1, 2.5);
+  const titleFontSize = Math.min(baseTitleFont, maxFontByHeight, width * 0.06);
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -45,7 +53,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
             className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-snug font-bold break-words overflow-hidden flex items-start"
             style={{
               height: `${height * 0.3 * scale}px`,
-              fontSize: `${(data.itemDescription.length > 70 ? titleFontSize * 0.5 : data.itemDescription.length > 40 ? titleFontSize * 0.65 : titleFontSize) * scale}px`,
+              fontSize: `${titleFontSize * scale}px`,
             }}
           >
             {data.itemDescription || '—'}
