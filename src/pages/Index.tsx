@@ -134,8 +134,8 @@ export default function Index() {
           const pageW = 210;
           const pageH = 297;
           const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-          const x = (pageW - data.size.width) / 2;
-          const y = (pageH - data.size.height) / 2;
+          const x = 10;
+          const y = 10;
           pdf.addImage(dataUrl, 'PNG', x, y, data.size.width, data.size.height);
           pdf.save(`${data.sku || 'label'}.pdf`);
         }
