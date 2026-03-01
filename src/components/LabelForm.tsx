@@ -96,7 +96,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                 value={data.qtyType ?? 'box'}
                 onValueChange={(v) => onChange({ qtyType: v as QtyType })}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full font-bold">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
