@@ -26,8 +26,8 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const scaledH = height * scale;
 
   const fontSize = Math.max(height * 0.08, 2);
-  const descAreaRatio = 0.26;
-  const tableAreaRatio = 0.12;
+  const descAreaRatio = 0.24;
+  const tableAreaRatio = 0.18;
 
   // Dynamic font sizing: fits any label size and text length
   const descLen = Math.max(data.itemDescription.length, 1);
@@ -110,7 +110,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           {/* Table at bottom */}
           <div
             className="absolute bottom-0 left-0 right-0 border-t-2 border-black flex"
-            style={{ height: `${height * 0.12 * scale}px` }}
+            style={{ height: `${height * tableAreaRatio * scale}px` }}
           >
             {/* SKU column */}
             <div className="flex-1 border-r border-black flex flex-col items-center justify-center">
