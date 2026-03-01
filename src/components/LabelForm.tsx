@@ -73,7 +73,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             onChange({ revision: v });
           }}
           placeholder="00"
-          className={`font-mono text-sm w-24 ${!data.revision ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+          className={`font-mono text-sm w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           maxLength={2}
         />
         {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
