@@ -4,10 +4,9 @@ import type { LabelData } from '@/lib/label-types';
 
 interface Props {
   data: LabelData;
-  showAnnotations?: boolean;
 }
 
-const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations }, ref) => {
+const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const [barcodeUrl, setBarcodeUrl] = useState('');
 
   useEffect(() => {
@@ -126,21 +125,6 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
           </div>
         </div>
 
-        {/* Annotations overlay */}
-        {showAnnotations && (
-          <div className="absolute inset-0 pointer-events-none" style={{ width: `${scaledW}px`, height: `${scaledH}px` }}>
-            <div className="absolute top-0 left-0 bg-primary/90 text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-br font-sans">
-              Item Description
-            </div>
-            <div className="absolute text-[10px] bg-primary/90 text-primary-foreground px-1.5 py-0.5 rounded font-sans"
-              style={{ top: '35%', right: '-2px', transform: 'translateX(100%)' }}>
-              ← Barcode (SKU)
-            </div>
-            <div className="absolute bottom-0 left-0 bg-primary/90 text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-tr font-sans">
-              {data.template === 'box' ? `SKU | Rev. | ${data.qtyType === 'pallet' ? 'Pallet' : data.qtyType === 'set' ? 'Set' : 'Box'} Qty` : 'SKU | Rev.'}
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="text-xs text-muted-foreground font-mono">
