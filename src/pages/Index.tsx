@@ -274,9 +274,9 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <Button onClick={() => handleExport('print')} variant="outline" className="h-11" disabled={!isFormValid}>
-                <Printer className="w-4 h-4 mr-2" />
-                {t(lang, 'print')}
+              <Button onClick={() => handleExport('print')} variant="outline" className="h-11 flex-col gap-0.5 py-1" disabled={!isFormValid}>
+                <span className="flex items-center gap-2"><Printer className="w-4 h-4" />{t(lang, 'print')}</span>
+                <span className="text-[10px] text-muted-foreground font-normal">Zebra Printer Only</span>
               </Button>
               <Button onClick={() => handleExport('pdf')} className="h-11" disabled={!isFormValid}>
                 <FileText className="w-4 h-4 mr-2" />
