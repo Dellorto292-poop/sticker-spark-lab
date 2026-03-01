@@ -107,10 +107,11 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           </div>
           <Input
             id="boxQty"
-            type="number"
-            min={1}
             value={data.boxQty ?? ''}
-            onChange={(e) => onChange({ boxQty: e.target.value ? parseInt(e.target.value) : undefined })}
+            onChange={(e) => {
+              const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+              onChange({ boxQty: v ? parseInt(v) : undefined });
+            }}
             placeholder={t(lang, 'boxQtyHint')}
             className={`font-mono text-sm w-28 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           />
