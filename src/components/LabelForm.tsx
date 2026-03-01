@@ -60,72 +60,63 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
       </div>
 
-      {/* Revision + Qty type row */}
-      <div className={`grid gap-4 ${data.template === 'box' ? 'grid-cols-[100px_1fr]' : ''}`}>
-        {/* Revision — exactly 2 digits */}
-        <div className="space-y-1.5">
-          <Label htmlFor="revision" className="text-sm font-medium">
-            {t(lang, 'revision')}
-          </Label>
-          <Input
-            id="revision"
-            value={data.revision}
-            onChange={(e) => {
-              const v = e.target.value.replace(/\s/g, '').replace(/\D/g, '').slice(0, 2);
-              onChange({ revision: v });
-            }}
-            placeholder="00"
-            className={`font-mono text-sm ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-            maxLength={2}
-          />
-          {data.revision.length > 0 && data.revision.length < 2 && (
-            <p className="text-xs text-destructive">{t(lang, 'invalidRevision')}</p>
-          )}
-          {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
-        </div>
-
-        {/* Qty type (only for box template) */}
-        {data.template === 'box' && (
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium">
-              {t(lang, 'qtyType')}
-            </Label>
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                {(['box', 'pallet', 'set'] as QtyType[]).map((qt) => {
-                  const labelKey = qt === 'box' ? 'boxQty' : qt === 'pallet' ? 'palletQty' : 'setQty';
-                  const isActive = (data.qtyType ?? 'box') === qt;
-                  return (
-                    <button
-                      key={qt}
-                      type="button"
-                      onClick={() => onChange({ qtyType: qt })}
-                      className={`px-2.5 h-10 text-xs font-medium rounded-md border transition-colors ${
-                        isActive
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-card text-muted-foreground border-border hover:border-primary/50'
-                      }`}
-                    >
-                      {t(lang, labelKey)}
-                    </button>
-                  );
-                })}
-              </div>
-              <Input
-                id="boxQty"
-                value={data.boxQty ?? ''}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g, '').slice(0, 6);
-                  onChange({ boxQty: v ? parseInt(v) : undefined });
-                }}
-                placeholder={t(lang, 'boxQtyHint')}
-                className={`font-mono text-sm w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-              />
-            </div>
-            {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
-          </div>
+      {/* Revision */}
+      <div className="space-y-1.5">
+        <Label htmlFor="revision" className="text-sm font-medium">
+          {t(lang, 'revision')}
+        </Label>
+        <Input
+          id="revision"
+          value={data.revision}
+          onChange={(e) => {
+            const v = e.target.value.replace(/\s/g, '').replace(/\D/g, '').slice(0, 2);
+            onChange({ revision: v });
+          }}
+          placeholder="00"
+          className={`font-mono text-sm w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+          maxLength={2}
+        />
+        {data.revision.length > 0 && data.revision.length < 2 && (
+          <p className="text-xs text-destructive">{t(lang, 'invalidRevision')}</p>
         )}
+        {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
       </div>
+
+      {/* Qty (only for box template) */}
+      {data.template === 'box' && (
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium">
+            {t(lang, 'qtyType')}
+          </Label>
+          <p className="text-xs text-muted-foreground">{t(lang, 'qtyTypeHint')}</p>
+          <div className="flex items-center gap-3">
+            <Select
+              value={data.qtyType ?? 'box'}
+              onValueChange={(v) => onChange({ qtyType: v as QtyType })}
+            >
+              <SelectTrigger className="w-36">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="box">{t(lang, 'boxQty')}</SelectItem>
+                <SelectItem value="pallet">{t(lang, 'palletQty')}</SelectItem>
+                <SelectItem value="set">{t(lang, 'setQty')}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              id="boxQty"
+              value={data.boxQty ?? ''}
+              onChange={(e) => {
+                const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+                onChange({ boxQty: v ? parseInt(v) : undefined });
+              }}
+              placeholder={t(lang, 'boxQtyHint')}
+              className={`font-mono text-sm w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            />
+          </div>
+          {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
+        </div>
+      )}
 
       {/* Settings section */}
       <div className="pt-3 border-t border-border space-y-3">
