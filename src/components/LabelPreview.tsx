@@ -30,12 +30,16 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const tableAreaRatio = 0.12;
   const descMaxLines = 3;
 
-  // Keep description strictly inside fixed top area
+  // Dynamic font sizing: fits any label size
   const descLen = Math.max(data.itemDescription.length, 1);
-  const baseTitleFont = Math.max(height * 0.1, 2.5);
-  const compressionByLength = Math.max(0.38, Math.min(1, 42 / descLen));
-  const maxFontByHeight = (height * (descAreaRatio - 0.02)) / (descMaxLines * 1.25);
-  const titleFontSize = Math.max(1.6, Math.min(baseTitleFont * compressionByLength, maxFontByHeight));
+  const descAreaH = height * descAreaRatio;
+  const descAreaW = width * 0.92; // account for px-[4%] padding
+  // Max font by height: must fit descMaxLines within the area
+  const maxFontByHeight = descAreaH / (descMaxLines * 1.3);
+  // Max font by width: estimate chars per line (~0.6 width per char in monospace)
+  const charsPerLine = Math.max(1, Math.ceil(descLen / descMaxLines));
+  const maxFontByWidth = descAreaW / (charsPerLine * 0.6);
+  const titleFontSize = Math.max(0.8, Math.min(maxFontByHeight, maxFontByWidth, height * 0.1));
 
   return (
     <div className="flex flex-col items-center gap-3">
