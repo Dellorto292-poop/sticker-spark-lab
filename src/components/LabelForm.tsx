@@ -132,7 +132,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             <Select
               value={sizePresetKey}
               onValueChange={(v) => {
-                if (v === 'custom') { onChange({ size: { width: 55, height: 28 } }); return; }
+                if (v === 'custom') { onChange({ size: { width: 0, height: 0 } }); return; }
                 const [w, h] = v.split('x').map(Number);
                 onChange({ size: { width: w, height: h } });
               }}
@@ -159,26 +159,32 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           <div className="flex-1 space-y-1">
             <Label className="text-xs">{t(lang, 'width')}</Label>
             <Input
-              type="number"
-              min={20}
-              max={200}
-              value={data.size.width}
-              onChange={(e) =>
-                onChange({ size: { ...data.size, width: Math.max(20, parseInt(e.target.value) || 20) } })
-              }
+              inputMode="numeric"
+              placeholder="мм"
+              value={data.size.width || ''}
+              onChange={(e) => {
+                const v = e.target.value.replace(/\D/g, '');
+                onChange({ size: { ...data.size, width: v ? parseInt(v) : 0 } });
+              }}
+              onBlur={() => {
+                if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
+              }}
               className="text-sm font-mono"
             />
           </div>
           <div className="flex-1 space-y-1">
             <Label className="text-xs">{t(lang, 'height')}</Label>
             <Input
-              type="number"
-              min={10}
-              max={200}
-              value={data.size.height}
-              onChange={(e) =>
-                onChange({ size: { ...data.size, height: Math.max(10, parseInt(e.target.value) || 10) } })
-              }
+              inputMode="numeric"
+              placeholder="мм"
+              value={data.size.height || ''}
+              onChange={(e) => {
+                const v = e.target.value.replace(/\D/g, '');
+                onChange({ size: { ...data.size, height: v ? parseInt(v) : 0 } });
+              }}
+              onBlur={() => {
+                if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
+              }}
               className="text-sm font-mono"
             />
           </div>
@@ -196,7 +202,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             <Select
               value={sizePresetKey}
               onValueChange={(v) => {
-                if (v === 'custom') { onChange({ size: { width: 55, height: 28 } }); return; }
+                if (v === 'custom') { onChange({ size: { width: 0, height: 0 } }); return; }
                 const [w, h] = v.split('x').map(Number);
                 onChange({ size: { width: w, height: h } });
               }}
@@ -219,18 +225,32 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               <div className="flex-1 space-y-1">
                 <Label className="text-xs">{t(lang, 'width')}</Label>
                 <Input
-                  type="number" min={20} max={200}
-                  value={data.size.width}
-                  onChange={(e) => onChange({ size: { ...data.size, width: Math.max(20, parseInt(e.target.value) || 20) } })}
+                  inputMode="numeric"
+                  placeholder="мм"
+                  value={data.size.width || ''}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, '');
+                    onChange({ size: { ...data.size, width: v ? parseInt(v) : 0 } });
+                  }}
+                  onBlur={() => {
+                    if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
+                  }}
                   className="text-sm font-mono"
                 />
               </div>
               <div className="flex-1 space-y-1">
                 <Label className="text-xs">{t(lang, 'height')}</Label>
                 <Input
-                  type="number" min={10} max={200}
-                  value={data.size.height}
-                  onChange={(e) => onChange({ size: { ...data.size, height: Math.max(10, parseInt(e.target.value) || 10) } })}
+                  inputMode="numeric"
+                  placeholder="мм"
+                  value={data.size.height || ''}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, '');
+                    onChange({ size: { ...data.size, height: v ? parseInt(v) : 0 } });
+                  }}
+                  onBlur={() => {
+                    if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
+                  }}
                   className="text-sm font-mono"
                 />
               </div>
