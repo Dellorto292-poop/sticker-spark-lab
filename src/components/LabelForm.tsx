@@ -61,8 +61,8 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
       </div>
 
-      {/* Revision + Qty row */}
-      <div className={`flex gap-4 ${data.template === 'box' ? '' : ''}`}>
+      {/* Revision + Qty/Size row */}
+      <div className="flex gap-4 flex-wrap">
         {/* Revision */}
         <div className="space-y-1.5 shrink-0">
           <Label htmlFor="revision" className="text-sm font-medium">
@@ -124,72 +124,120 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             </div>
           </>
         )}
-      </div>
 
-      {/* Settings section */}
-      <div className="pt-3 border-t border-border space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {t(lang, 'settings')}
-        </h3>
-
-        {/* Label size */}
-        <div className="flex items-center justify-between">
-          <Label className="text-sm">{t(lang, 'labelSize')}</Label>
-          <Select
-            value={sizePresetKey}
-            onValueChange={(v) => {
-              if (v === 'custom') return;
-              const [w, h] = v.split('x').map(Number);
-              onChange({ size: { width: w, height: h } });
-            }}
-          >
-            <SelectTrigger className="w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {presets.map((p) => (
-                <SelectItem key={`${p.width}x${p.height}`} value={`${p.width}x${p.height}`}>
-                  {p.name}
-                </SelectItem>
-              ))}
-              <SelectItem value="custom">{t(lang, 'customSize')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Custom size inputs */}
-        {sizePresetKey === 'custom' && (
-          <div className="flex gap-2">
-            <div className="flex-1 space-y-1">
-              <Label className="text-xs">{t(lang, 'width')}</Label>
-              <Input
-                type="number"
-                min={20}
-                max={200}
-                value={data.size.width}
-                onChange={(e) =>
-                  onChange({ size: { ...data.size, width: Math.max(20, parseInt(e.target.value) || 20) } })
-                }
-                className="text-sm font-mono"
-              />
-            </div>
-            <div className="flex-1 space-y-1">
-              <Label className="text-xs">{t(lang, 'height')}</Label>
-              <Input
-                type="number"
-                min={10}
-                max={200}
-                value={data.size.height}
-                onChange={(e) =>
-                  onChange({ size: { ...data.size, height: Math.max(10, parseInt(e.target.value) || 10) } })
-                }
-                className="text-sm font-mono"
-              />
-            </div>
+        {/* Label size inline for unit template */}
+        {data.template === 'unit' && (
+          <div className="space-y-1.5 flex-1 min-w-[140px]">
+            <Label className="text-sm font-medium">{t(lang, 'labelSize')}</Label>
+            <Select
+              value={sizePresetKey}
+              onValueChange={(v) => {
+                if (v === 'custom') return;
+                const [w, h] = v.split('x').map(Number);
+                onChange({ size: { width: w, height: h } });
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {presets.map((p) => (
+                  <SelectItem key={`${p.width}x${p.height}`} value={`${p.width}x${p.height}`}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+                <SelectItem value="custom">{t(lang, 'customSize')}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         )}
-
       </div>
+
+      {/* Custom size inputs for unit template */}
+      {data.template === 'unit' && sizePresetKey === 'custom' && (
+        <div className="flex gap-2">
+          <div className="flex-1 space-y-1">
+            <Label className="text-xs">{t(lang, 'width')}</Label>
+            <Input
+              type="number"
+              min={20}
+              max={200}
+              value={data.size.width}
+              onChange={(e) =>
+                onChange({ size: { ...data.size, width: Math.max(20, parseInt(e.target.value) || 20) } })
+              }
+              className="text-sm font-mono"
+            />
+          </div>
+          <div className="flex-1 space-y-1">
+            <Label className="text-xs">{t(lang, 'height')}</Label>
+            <Input
+              type="number"
+              min={10}
+              max={200}
+              value={data.size.height}
+              onChange={(e) =>
+                onChange({ size: { ...data.size, height: Math.max(10, parseInt(e.target.value) || 10) } })
+              }
+              className="text-sm font-mono"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Settings section (only for box template) */}
+      {data.template === 'box' && (
+        <div className="pt-3 border-t border-border space-y-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {t(lang, 'settings')}
+          </h3>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm">{t(lang, 'labelSize')}</Label>
+            <Select
+              value={sizePresetKey}
+              onValueChange={(v) => {
+                if (v === 'custom') return;
+                const [w, h] = v.split('x').map(Number);
+                onChange({ size: { width: w, height: h } });
+              }}
+            >
+              <SelectTrigger className="w-36">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {presets.map((p) => (
+                  <SelectItem key={`${p.width}x${p.height}`} value={`${p.width}x${p.height}`}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+                <SelectItem value="custom">{t(lang, 'customSize')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {sizePresetKey === 'custom' && (
+            <div className="flex gap-2">
+              <div className="flex-1 space-y-1">
+                <Label className="text-xs">{t(lang, 'width')}</Label>
+                <Input
+                  type="number" min={20} max={200}
+                  value={data.size.width}
+                  onChange={(e) => onChange({ size: { ...data.size, width: Math.max(20, parseInt(e.target.value) || 20) } })}
+                  className="text-sm font-mono"
+                />
+              </div>
+              <div className="flex-1 space-y-1">
+                <Label className="text-xs">{t(lang, 'height')}</Label>
+                <Input
+                  type="number" min={10} max={200}
+                  value={data.size.height}
+                  onChange={(e) => onChange({ size: { ...data.size, height: Math.max(10, parseInt(e.target.value) || 10) } })}
+                  className="text-sm font-mono"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
   );

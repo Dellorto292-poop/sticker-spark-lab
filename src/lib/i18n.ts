@@ -5,7 +5,7 @@ const translations = {
     appTitle: 'Генератор этикеток',
     appSubtitle: 'Складская маркировка',
     selectTemplate: 'Выберите шаблон',
-    unitLabel: 'Маркировка единицы',
+    unitLabel: 'Маркировка индивидуальной единицы продукта',
     unitLabelDesc: 'Индивидуальная единица продукта',
     boxLabel: 'Маркировка короба/палеты/сета',
     boxLabelDesc: 'Короб, палета или сет',

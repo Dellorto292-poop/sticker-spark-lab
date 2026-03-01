@@ -280,7 +280,7 @@ export default function Index() {
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-xl p-5 sticky top-6">
               <h3 className="text-sm font-semibold mb-4">{t(lang, 'preview')}</h3>
-              <div className="flex items-center justify-center bg-muted/30 rounded-lg p-6" style={{ minHeight: '400px' }}>
+              <div className="flex items-center justify-center bg-muted/30 rounded-lg p-6" style={{ minHeight: '320px' }}>
                 <LabelPreview ref={previewRef} data={data} showAnnotations={showAnnotations} />
               </div>
             </div>

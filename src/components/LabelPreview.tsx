@@ -19,8 +19,10 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
   }, [data.sku, data.barcodeType, data.size.width]);
 
   const { width, height } = data.size;
-  // Scale to fit preview area: max 400px wide
-  const scale = Math.min(520 / width, 400 / height, 6);
+  // Scale to fit a fixed preview area (520×260) for consistent sizing
+  const maxW = 520;
+  const maxH = 260;
+  const scale = Math.min(maxW / width, maxH / height, 6);
   const scaledW = width * scale;
   const scaledH = height * scale;
 
