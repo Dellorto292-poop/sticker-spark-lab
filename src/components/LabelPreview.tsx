@@ -26,20 +26,27 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const scaledH = height * scale;
 
   const fontSize = Math.max(height * 0.08, 2);
-  const descAreaRatio = 0.24;
+  const descAreaRatio = 0.26;
   const tableAreaRatio = 0.12;
-  const descMaxLines = 3;
 
-  // Dynamic font sizing: fits any label size
+  // Dynamic font sizing: fits any label size and text length
   const descLen = Math.max(data.itemDescription.length, 1);
   const descAreaH = height * descAreaRatio;
   const descAreaW = width * 0.92; // account for px-[4%] padding
+
+  // Dynamic max lines: more lines for longer text on smaller labels
+  const minFontSize = 1.0; // mm - absolute minimum readable
+  const idealFontH = height * 0.08;
+  const idealLines = Math.ceil(descAreaH / (idealFontH * 1.3));
+  const neededLines = Math.ceil((descLen * idealFontH * 0.6) / descAreaW);
+  const descMaxLines = Math.max(2, Math.min(Math.max(idealLines, neededLines), 6));
+
   // Max font by height: must fit descMaxLines within the area
   const maxFontByHeight = descAreaH / (descMaxLines * 1.3);
   // Max font by width: estimate chars per line (~0.6 width per char in monospace)
   const charsPerLine = Math.max(1, Math.ceil(descLen / descMaxLines));
   const maxFontByWidth = descAreaW / (charsPerLine * 0.6);
-  const titleFontSize = Math.max(0.8, Math.min(maxFontByHeight, maxFontByWidth, height * 0.1));
+  const titleFontSize = Math.max(minFontSize, Math.min(maxFontByHeight, maxFontByWidth, height * 0.1));
 
   return (
     <div className="flex flex-col items-center gap-3">
