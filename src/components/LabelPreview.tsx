@@ -114,14 +114,14 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           >
             {/* SKU column */}
             <div className="flex-1 border-r border-black flex items-center px-[3%] gap-[4%]">
-              <div className="uppercase whitespace-nowrap opacity-50" style={{ fontSize: `${fontSize * scale * 0.5}px` }}>SKU</div>
+              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * 0.55}px`, opacity: 0.7 }}>SKU</div>
               <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
                 {data.sku || '—'}
               </div>
             </div>
             {/* Rev column */}
             <div className={`flex-1 ${data.template === 'box' ? 'border-r border-black' : ''} flex items-center px-[3%] gap-[4%]`}>
-              <div className="uppercase whitespace-nowrap opacity-50" style={{ fontSize: `${fontSize * scale * 0.5}px` }}>Rev.</div>
+              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * 0.55}px`, opacity: 0.7 }}>Rev.</div>
               <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
                 {data.revision || '—'}
               </div>
@@ -129,7 +129,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             {/* Box Qty column (only for box template) */}
             {data.template === 'box' && (
               <div className="flex-1 flex items-center px-[3%] gap-[4%]">
-                <div className="uppercase whitespace-nowrap opacity-50" style={{ fontSize: `${fontSize * scale * 0.5}px` }}>
+                <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * 0.55}px`, opacity: 0.7 }}>
                   {data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty'}
                 </div>
                 <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
