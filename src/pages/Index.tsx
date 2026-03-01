@@ -184,7 +184,6 @@ export default function Index() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">{t(lang, 'unitLabel')}</h3>
-                  <p className="text-xs text-muted-foreground mt-1">{t(lang, 'unitLabelDesc')}</p>
                 </div>
               </button>
 
@@ -197,7 +196,6 @@ export default function Index() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">{t(lang, 'boxLabel')}</h3>
-                  <p className="text-xs text-muted-foreground mt-1">{t(lang, 'boxLabelDesc')}</p>
                 </div>
               </button>
             </div>
