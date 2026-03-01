@@ -12,9 +12,9 @@ export const SIZE_PRESETS: LabelSize[] = [
   { name: '40×20 мм', width: 40, height: 20 },
   { name: '50×25 мм', width: 50, height: 25 },
   { name: '60×30 мм', width: 60, height: 30 },
-  { name: '100×50 мм', width: 100, height: 50 },
-  { name: '100×70 мм', width: 100, height: 70 },
 ];
+
+export const DEFAULT_SKU_REGEX = '^[A-Z0-9]+$';
 
 export interface LabelData {
   id: string;
