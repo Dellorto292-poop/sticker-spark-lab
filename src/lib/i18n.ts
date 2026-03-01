@@ -12,7 +12,7 @@ const translations = {
     itemDescription: 'Наименование',
     itemDescriptionHint: 'Введите наименование из Oracle',
     sku: 'Инвентарный SKU',
-    skuHint: 'Только латиница и цифры · копируйте из Oracle',
+    skuHint: 'Только латиница и цифры · рекомендуем скопировать из Oracle',
     revision: 'Ревизия',
     revisionHint: '2-3 символа',
     boxQty: 'Box Qty',
