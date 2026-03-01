@@ -267,8 +267,6 @@ export default function Index() {
                 onChange={handleChange}
                 lang={lang}
                 errors={errors}
-                skuRegex={skuRegex}
-                onSkuRegexChange={setSkuRegex}
               />
             </div>
 

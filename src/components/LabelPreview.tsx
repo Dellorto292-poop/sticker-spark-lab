@@ -64,9 +64,6 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
                 [barcode]
               </div>
             )}
-            <div className="font-mono font-semibold mt-[1px]" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
-              {data.sku || '—'}
-            </div>
           </div>
 
           {/* Table at bottom */}

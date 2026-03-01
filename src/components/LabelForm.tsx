@@ -1,26 +1,19 @@
-import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { LabelData } from '@/lib/label-types';
-import { SIZE_PRESETS, DEFAULT_SKU_REGEX } from '@/lib/label-types';
+import { SIZE_PRESETS } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
-import { Settings2 } from 'lucide-react';
 
 interface Props {
   data: LabelData;
   onChange: (data: Partial<LabelData>) => void;
   lang: Lang;
   errors: Record<string, string>;
-  skuRegex: string;
-  onSkuRegexChange: (v: string) => void;
 }
 
-export default function LabelForm({ data, onChange, lang, errors, skuRegex, onSkuRegexChange }: Props) {
-  const [advancedOpen, setAdvancedOpen] = useState(false);
-
+export default function LabelForm({ data, onChange, lang, errors }: Props) {
   const sizePresetKey = SIZE_PRESETS.find(
     (p) => p.width === data.size.width && p.height === data.size.height
   )
@@ -56,7 +49,10 @@ export default function LabelForm({ data, onChange, lang, errors, skuRegex, onSk
         <Input
           id="sku"
           value={data.sku}
-          onChange={(e) => onChange({ sku: e.target.value })}
+          onChange={(e) => {
+            const v = e.target.value.replace(/\s/g, '');
+            onChange({ sku: v });
+          }}
           placeholder={t(lang, 'skuHint')}
           className="font-mono text-sm"
           maxLength={30}
@@ -73,7 +69,7 @@ export default function LabelForm({ data, onChange, lang, errors, skuRegex, onSk
           id="revision"
           value={data.revision}
           onChange={(e) => {
-            const v = e.target.value.slice(0, 2);
+            const v = e.target.value.replace(/\s/g, '').replace(/\D/g, '').slice(0, 2);
             onChange({ revision: v });
           }}
           placeholder="00"
@@ -167,25 +163,6 @@ export default function LabelForm({ data, onChange, lang, errors, skuRegex, onSk
 
       </div>
 
-      {/* Advanced settings */}
-      <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
-        <CollapsibleTrigger className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors pt-1">
-          <Settings2 className="w-3.5 h-3.5" />
-          {t(lang, 'advanced')}
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-3 space-y-2">
-          <div className="space-y-1.5">
-            <Label className="text-xs">{t(lang, 'skuRegex')}</Label>
-            <Input
-              value={skuRegex}
-              onChange={(e) => onSkuRegexChange(e.target.value)}
-              placeholder={DEFAULT_SKU_REGEX}
-              className="font-mono text-xs"
-            />
-            <p className="text-[10px] text-muted-foreground">{t(lang, 'skuRegexHint')}</p>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
     </div>
   );
 }
