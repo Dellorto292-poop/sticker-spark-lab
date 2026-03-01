@@ -42,8 +42,11 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
         >
           {/* Item Description */}
           <div
-            className="px-[4%] pt-[3%] leading-tight font-bold break-words"
-            style={{ fontSize: `${titleFontSize * scale}px` }}
+            className="px-[4%] pt-[3%] leading-tight font-bold break-words overflow-hidden"
+            style={{
+              fontSize: `${(data.itemDescription.length > 60 ? titleFontSize * 0.6 : data.itemDescription.length > 30 ? titleFontSize * 0.8 : titleFontSize) * scale}px`,
+              maxHeight: `${height * 0.3 * scale}px`,
+            }}
           >
             {data.itemDescription || '—'}
           </div>
