@@ -137,7 +137,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                 onChange({ size: { width: w, height: h } });
               }}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full font-bold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -207,7 +207,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                 onChange({ size: { width: w, height: h } });
               }}
             >
-              <SelectTrigger className="w-36">
+              <SelectTrigger className="w-36 font-bold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
