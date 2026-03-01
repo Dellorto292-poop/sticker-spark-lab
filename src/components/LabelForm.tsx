@@ -158,8 +158,8 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
             {lang === 'ru'
-              ? 'Макс. размер для PDF: 200 × 287 мм (отступ 10 мм сверху и слева на А4)'
-              : 'Max size for PDF: 200 × 287 mm (10 mm top & left margin on A4)'}
+              ? 'Макс. размер для печати на А4: 190 × 277 мм (с учётом отступов 10 мм)'
+              : 'Max printable size on A4: 190 × 277 mm (10 mm margins)'}
           </p>
           <div className="flex gap-2">
           <div className="flex-1 space-y-1">
