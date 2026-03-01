@@ -1,20 +1,26 @@
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { LabelData, BarcodeType, DPI } from '@/lib/label-types';
-import { SIZE_PRESETS } from '@/lib/label-types';
+import { SIZE_PRESETS, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
+import { Settings2 } from 'lucide-react';
 
 interface Props {
   data: LabelData;
   onChange: (data: Partial<LabelData>) => void;
   lang: Lang;
   errors: Record<string, string>;
+  skuRegex: string;
+  onSkuRegexChange: (v: string) => void;
 }
 
-export default function LabelForm({ data, onChange, lang, errors }: Props) {
+export default function LabelForm({ data, onChange, lang, errors, skuRegex, onSkuRegexChange }: Props) {
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+
   const sizePresetKey = SIZE_PRESETS.find(
     (p) => p.width === data.size.width && p.height === data.size.height
   )
@@ -42,7 +48,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         )}
       </div>
 
-      {/* SKU */}
+      {/* SKU — NO auto-correction */}
       <div className="space-y-1.5">
         <Label htmlFor="sku" className="text-sm font-medium">
           {t(lang, 'sku')}
@@ -50,15 +56,15 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         <Input
           id="sku"
           value={data.sku}
-          onChange={(e) => onChange({ sku: e.target.value.replace(/\s/g, '').toUpperCase() })}
+          onChange={(e) => onChange({ sku: e.target.value })}
           placeholder={t(lang, 'skuHint')}
-          className="font-mono text-sm uppercase"
+          className="font-mono text-sm"
           maxLength={30}
         />
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
       </div>
 
-      {/* Revision */}
+      {/* Revision — exactly 2 digits */}
       <div className="space-y-1.5">
         <Label htmlFor="revision" className="text-sm font-medium">
           {t(lang, 'revision')}
@@ -66,10 +72,13 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         <Input
           id="revision"
           value={data.revision}
-          onChange={(e) => onChange({ revision: e.target.value.slice(0, 3) })}
-          placeholder={t(lang, 'revisionHint')}
+          onChange={(e) => {
+            const v = e.target.value.slice(0, 2);
+            onChange({ revision: v });
+          }}
+          placeholder="00"
           className="font-mono text-sm w-24"
-          maxLength={3}
+          maxLength={2}
         />
         {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
       </div>
@@ -110,8 +119,8 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="code128">Code 128</SelectItem>
               <SelectItem value="code39">Code 39</SelectItem>
+              <SelectItem value="code128">Code 128</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -190,6 +199,26 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           </Select>
         </div>
       </div>
+
+      {/* Advanced settings */}
+      <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+        <CollapsibleTrigger className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors pt-1">
+          <Settings2 className="w-3.5 h-3.5" />
+          {t(lang, 'advanced')}
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 space-y-2">
+          <div className="space-y-1.5">
+            <Label className="text-xs">{t(lang, 'skuRegex')}</Label>
+            <Input
+              value={skuRegex}
+              onChange={(e) => onSkuRegexChange(e.target.value)}
+              placeholder={DEFAULT_SKU_REGEX}
+              className="font-mono text-xs"
+            />
+            <p className="text-[10px] text-muted-foreground">{t(lang, 'skuRegexHint')}</p>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }

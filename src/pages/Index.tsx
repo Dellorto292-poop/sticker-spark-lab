@@ -9,12 +9,11 @@ import LabelForm from '@/components/LabelForm';
 import LabelPreview from '@/components/LabelPreview';
 import HistoryPanel from '@/components/HistoryPanel';
 import { t, type Lang } from '@/lib/i18n';
-import { generateZpl } from '@/lib/zpl';
 import { addToHistory } from '@/lib/history';
 import type { LabelData, TemplateType } from '@/lib/label-types';
-import { generateId } from '@/lib/label-types';
+import { generateId, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import {
-  Printer, Download, FileText, FileImage, Code, Package, Box,
+  Printer, FileText, FileImage, Package, Box,
   ArrowLeft, Languages, Eye
 } from 'lucide-react';
 
@@ -24,9 +23,9 @@ function createDefaultData(template: TemplateType): LabelData {
     template,
     itemDescription: '',
     sku: '',
-    revision: '',
+    revision: '00',
     boxQty: template === 'box' ? 1 : undefined,
-    barcodeType: 'code128',
+    barcodeType: 'code39',
     size: { width: 60, height: 30 },
     dpi: 203,
     createdAt: Date.now(),
@@ -40,11 +39,11 @@ export default function Index() {
   const [showAnnotations, setShowAnnotations] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [historyRefresh, setHistoryRefresh] = useState(0);
+  const [skuRegex, setSkuRegex] = useState(DEFAULT_SKU_REGEX);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleChange = useCallback((partial: Partial<LabelData>) => {
     setData((prev) => ({ ...prev, ...partial }));
-    // Clear errors for changed fields
     const keys = Object.keys(partial);
     setErrors((prev) => {
       const next = { ...prev };
@@ -56,10 +55,17 @@ export default function Index() {
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
     if (!data.itemDescription.trim()) errs.itemDescription = t(lang, 'required');
-    if (!data.sku.trim()) errs.sku = t(lang, 'required');
-    else if (!/^[A-Za-z0-9\-_.]+$/.test(data.sku)) errs.sku = t(lang, 'invalidSku');
-    if (!data.revision.trim()) errs.revision = t(lang, 'required');
-    else if (data.revision.length < 2) errs.revision = t(lang, 'invalidRevision');
+    if (!data.sku) errs.sku = t(lang, 'required');
+    else {
+      try {
+        const re = new RegExp(skuRegex);
+        if (!re.test(data.sku)) errs.sku = `${t(lang, 'invalidSku')} (${skuRegex})`;
+      } catch {
+        // invalid regex — skip validation
+      }
+    }
+    if (!data.revision) errs.revision = t(lang, 'required');
+    else if (!/^\d{2}$/.test(data.revision)) errs.revision = t(lang, 'invalidRevision');
     if (data.template === 'box') {
       if (!data.boxQty || data.boxQty < 1 || !Number.isInteger(data.boxQty))
         errs.boxQty = t(lang, 'invalidQty');
@@ -68,28 +74,15 @@ export default function Index() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleExport = async (type: 'pdf' | 'png' | 'zpl' | 'zpl-copy' | 'print') => {
-    if (type !== 'print' && !validate()) return;
+  const handleExport = async (type: 'pdf' | 'png' | 'print') => {
+    if (!validate()) return;
 
-    // Save to history
     const entry = { ...data, id: generateId(), createdAt: Date.now() };
     addToHistory(entry);
     setHistoryRefresh((n) => n + 1);
 
     if (type === 'print') {
       window.print();
-      return;
-    }
-
-    if (type === 'zpl' || type === 'zpl-copy') {
-      const zpl = generateZpl(data);
-      if (type === 'zpl-copy') {
-        await navigator.clipboard.writeText(zpl);
-        toast.success(t(lang, 'zplCopied'));
-      } else {
-        const blob = new Blob([zpl], { type: 'text/plain' });
-        downloadBlob(blob, `${data.sku || 'label'}.zpl`);
-      }
       return;
     }
 
@@ -124,15 +117,6 @@ export default function Index() {
     }
   };
 
-  function downloadBlob(blob: Blob, filename: string) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
   const handleRepeat = (item: LabelData) => {
     if (item.sku) {
       setData({ ...item, id: generateId(), createdAt: Date.now() });
@@ -151,7 +135,6 @@ export default function Index() {
   if (!selectedTemplate) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        {/* Header */}
         <header className="border-b border-border bg-card">
           <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -175,7 +158,6 @@ export default function Index() {
           </div>
         </header>
 
-        {/* Template selection */}
         <div className="flex-1 flex items-center justify-center px-6">
           <div className="max-w-lg w-full space-y-6">
             <h2 className="text-xl font-semibold text-center">{t(lang, 'selectTemplate')}</h2>
@@ -207,7 +189,6 @@ export default function Index() {
               </button>
             </div>
 
-            {/* History below */}
             <div className="pt-4 border-t border-border">
               <HistoryPanel lang={lang} onRepeat={handleRepeat} refreshKey={historyRefresh} />
             </div>
@@ -220,7 +201,6 @@ export default function Index() {
   // Editor screen
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -265,16 +245,21 @@ export default function Index() {
         </div>
       </header>
 
-      {/* Main content */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left: Form */}
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-xl p-5">
-              <LabelForm data={data} onChange={handleChange} lang={lang} errors={errors} />
+              <LabelForm
+                data={data}
+                onChange={handleChange}
+                lang={lang}
+                errors={errors}
+                skuRegex={skuRegex}
+                onSkuRegexChange={setSkuRegex}
+              />
             </div>
 
-            {/* History */}
             <div className="bg-card border border-border rounded-xl p-5">
               <HistoryPanel lang={lang} onRepeat={handleRepeat} refreshKey={historyRefresh} />
             </div>
@@ -289,46 +274,18 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Export buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={() => handleExport('print')}
-                variant="outline"
-                className="h-11"
-              >
+            <div className="grid grid-cols-3 gap-3">
+              <Button onClick={() => handleExport('print')} variant="outline" className="h-11">
                 <Printer className="w-4 h-4 mr-2" />
                 {t(lang, 'print')}
               </Button>
-              <Button
-                onClick={() => handleExport('pdf')}
-                className="h-11"
-              >
+              <Button onClick={() => handleExport('pdf')} className="h-11">
                 <FileText className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPdf')}
               </Button>
-              <Button
-                onClick={() => handleExport('png')}
-                variant="outline"
-                className="h-11"
-              >
+              <Button onClick={() => handleExport('png')} variant="outline" className="h-11">
                 <FileImage className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPng')}
-              </Button>
-              <Button
-                onClick={() => handleExport('zpl-copy')}
-                variant="outline"
-                className="h-11"
-              >
-                <Code className="w-4 h-4 mr-2" />
-                {t(lang, 'copyZpl')}
-              </Button>
-              <Button
-                onClick={() => handleExport('zpl')}
-                variant="outline"
-                className="h-11 col-span-2"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                {t(lang, 'downloadZpl')}
               </Button>
             </div>
           </div>
