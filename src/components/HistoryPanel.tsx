@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { getHistory, clearHistory } from '@/lib/history';
 import type { LabelData } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
-import { RotateCcw, Trash2, Package, Box } from 'lucide-react';
+import { Trash2, Package, Box } from 'lucide-react';
 
 interface Props {
   lang: Lang;
@@ -41,9 +41,11 @@ export default function HistoryPanel({ lang, onRepeat, refreshKey }: Props) {
         <ScrollArea className="h-[300px]">
           <div className="space-y-2 pr-2">
             {history.map((item) => (
-              <div
+              <button
                 key={item.id}
-                className="flex items-start gap-2 p-2.5 rounded-md border border-border bg-card hover:bg-secondary/50 transition-colors group"
+                type="button"
+                onClick={() => onRepeat(item)}
+                className="flex items-start gap-2 p-2.5 rounded-md border border-border bg-card hover:bg-secondary/50 transition-colors w-full text-left cursor-pointer"
               >
                 <div className="mt-0.5">
                   {item.template === 'unit' ? (
@@ -60,15 +62,7 @@ export default function HistoryPanel({ lang, onRepeat, refreshKey }: Props) {
                     {item.template === 'box' && item.boxQty ? ` · Qty: ${item.boxQty}` : ''}
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onRepeat(item)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity h-7 px-2"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                </Button>
-              </div>
+              </button>
             ))}
           </div>
         </ScrollArea>
