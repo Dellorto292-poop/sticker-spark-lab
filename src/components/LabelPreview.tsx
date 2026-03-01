@@ -40,24 +40,31 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
             color: '#000',
           }}
         >
-          {/* Item Description */}
+          {/* Item Description (fixed area) */}
           <div
-            className="px-[4%] pt-[3%] leading-tight font-bold break-words overflow-hidden"
+            className="absolute left-0 right-0 top-0 px-[4%] pt-[3%] leading-tight font-bold break-all overflow-hidden"
             style={{
+              height: `${height * 0.3 * scale}px`,
               fontSize: `${(data.itemDescription.length > 60 ? titleFontSize * 0.6 : data.itemDescription.length > 30 ? titleFontSize * 0.8 : titleFontSize) * scale}px`,
-              maxHeight: `${height * 0.3 * scale}px`,
             }}
           >
             {data.itemDescription || '—'}
           </div>
 
-          {/* Barcode */}
-          <div className="flex flex-col items-center justify-center" style={{ padding: `${3 * scale}px 0` }}>
+          {/* Barcode (fixed area) */}
+          <div
+            className="absolute left-0 right-0 flex flex-col items-center justify-center"
+            style={{
+              top: `${height * 0.3 * scale}px`,
+              bottom: `${height * 0.28 * scale}px`,
+              padding: `${2 * scale}px 0`,
+            }}
+          >
             {barcodeUrl ? (
               <img
                 src={barcodeUrl}
                 alt="barcode"
-                style={{ maxWidth: '90%', height: `${height * 0.35 * scale}px`, objectFit: 'contain' }}
+                style={{ maxWidth: '90%', height: `${height * 0.34 * scale}px`, objectFit: 'contain' }}
               />
             ) : (
             <div
