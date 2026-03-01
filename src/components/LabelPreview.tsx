@@ -31,7 +31,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
   // Adaptive ratios: large formats need less relative space for desc/table
   const descAreaRatio = isLargeFormat ? 0.20 : 0.24;
-  const tableAreaRatio = isLargeFormat ? 0.08 : 0.18;
+  const tableAreaRatio = isLargeFormat ? 0.12 : 0.18;
 
   // Dynamic font sizing: fits any label size and text length
   const descLen = Math.max(data.itemDescription.length, 1);
