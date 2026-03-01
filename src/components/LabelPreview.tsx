@@ -59,9 +59,10 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             height: `${scaledH}px`,
             fontFamily: "'JetBrains Mono', 'Courier New', monospace",
             color: '#000',
-            // @ts-ignore – CSS custom properties for print sizing
             '--print-w': `${width}mm`,
             '--print-h': `${height}mm`,
+            '--print-scale-x': `${(width * 3.7795) / scaledW}`,
+            '--print-scale-y': `${(height * 3.7795) / scaledH}`,
           } as React.CSSProperties}
         >
           {/* Item Description (fixed area) */}
