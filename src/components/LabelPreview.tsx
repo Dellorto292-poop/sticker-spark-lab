@@ -27,7 +27,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
   const fontSize = Math.max(height * 0.08, 2);
   const descAreaRatio = 0.28;
-  const tableAreaRatio = 0.28;
+  const tableAreaRatio = 0.20;
   const descMaxLines = 3;
 
   // Keep description strictly inside fixed top area
