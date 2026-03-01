@@ -132,7 +132,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             <Select
               value={sizePresetKey}
               onValueChange={(v) => {
-                if (v === 'custom') return;
+                if (v === 'custom') { onChange({ size: { width: 55, height: 28 } }); return; }
                 const [w, h] = v.split('x').map(Number);
                 onChange({ size: { width: w, height: h } });
               }}
@@ -196,7 +196,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             <Select
               value={sizePresetKey}
               onValueChange={(v) => {
-                if (v === 'custom') return;
+                if (v === 'custom') { onChange({ size: { width: 55, height: 28 } }); return; }
                 const [w, h] = v.split('x').map(Number);
                 onChange({ size: { width: w, height: h } });
               }}
