@@ -155,7 +155,13 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
 
       {/* Custom size inputs for unit template */}
       {data.template === 'unit' && sizePresetKey === 'custom' && (
-        <div className="flex gap-2">
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            {lang === 'ru'
+              ? 'Макс. размер для печати на А4: 190 × 277 мм (с учётом отступов 10 мм)'
+              : 'Max printable size on A4: 190 × 277 mm (10 mm margins)'}
+          </p>
+          <div className="flex gap-2">
           <div className="flex-1 space-y-1">
             <Label className="text-xs">{t(lang, 'width')}</Label>
             <Input
@@ -187,6 +193,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               }}
               className="text-sm font-mono"
             />
+          </div>
           </div>
         </div>
       )}
