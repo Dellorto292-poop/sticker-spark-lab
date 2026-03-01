@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import type { LabelData, BarcodeType, DPI } from '@/lib/label-types';
+import type { LabelData } from '@/lib/label-types';
 import { SIZE_PRESETS, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
 import { Settings2 } from 'lucide-react';
@@ -108,23 +108,6 @@ export default function LabelForm({ data, onChange, lang, errors, skuRegex, onSk
           {t(lang, 'settings')}
         </h3>
 
-        {/* Barcode type */}
-        <div className="flex items-center justify-between">
-          <Label className="text-sm">{t(lang, 'barcodeType')}</Label>
-          <Select
-            value={data.barcodeType}
-            onValueChange={(v) => onChange({ barcodeType: v as BarcodeType })}
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="code39">Code 39</SelectItem>
-              <SelectItem value="code128">Code 128</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         {/* Label size */}
         <div className="flex items-center justify-between">
           <Label className="text-sm">{t(lang, 'labelSize')}</Label>
@@ -182,22 +165,6 @@ export default function LabelForm({ data, onChange, lang, errors, skuRegex, onSk
           </div>
         )}
 
-        {/* DPI */}
-        <div className="flex items-center justify-between">
-          <Label className="text-sm">{t(lang, 'dpi')}</Label>
-          <Select
-            value={String(data.dpi)}
-            onValueChange={(v) => onChange({ dpi: Number(v) as DPI })}
-          >
-            <SelectTrigger className="w-24">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="203">203 dpi</SelectItem>
-              <SelectItem value="300">300 dpi</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       {/* Advanced settings */}

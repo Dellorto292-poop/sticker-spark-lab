@@ -20,7 +20,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
 
   const { width, height } = data.size;
   // Scale to fit preview area: max 400px wide
-  const scale = Math.min(400 / width, 300 / height, 4);
+  const scale = Math.min(520 / width, 400 / height, 6);
   const scaledW = width * scale;
   const scaledH = height * scale;
 
@@ -49,17 +49,17 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
           </div>
 
           {/* Barcode */}
-          <div className="flex flex-col items-center justify-center" style={{ padding: `${2 * scale}px 0` }}>
+          <div className="flex flex-col items-center justify-center" style={{ padding: `${3 * scale}px 0` }}>
             {barcodeUrl ? (
               <img
                 src={barcodeUrl}
                 alt="barcode"
-                style={{ maxWidth: '80%', height: `${height * 0.25 * scale}px`, objectFit: 'contain' }}
+                style={{ maxWidth: '90%', height: `${height * 0.35 * scale}px`, objectFit: 'contain' }}
               />
             ) : (
             <div
                 className="flex items-center justify-center text-muted-foreground border border-dashed border-border"
-                style={{ width: '60%', height: `${height * 0.2 * scale}px`, fontSize: `${fontSize * scale * 0.7}px` }}
+                style={{ width: '70%', height: `${height * 0.3 * scale}px`, fontSize: `${fontSize * scale * 0.7}px` }}
               >
                 [barcode]
               </div>
