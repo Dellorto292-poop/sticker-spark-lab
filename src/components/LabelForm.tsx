@@ -60,67 +60,70 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
       </div>
 
-      {/* Revision — exactly 2 digits */}
-      <div className="space-y-1.5">
-        <Label htmlFor="revision" className="text-sm font-medium">
-          {t(lang, 'revision')}
-        </Label>
-        <Input
-          id="revision"
-          value={data.revision}
-          onChange={(e) => {
-            const v = e.target.value.replace(/\s/g, '').replace(/\D/g, '').slice(0, 2);
-            onChange({ revision: v });
-          }}
-          placeholder="00"
-          className={`font-mono text-sm w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-          maxLength={2}
-        />
-        {data.revision.length > 0 && data.revision.length < 2 && (
-          <p className="text-xs text-destructive">{t(lang, 'invalidRevision')}</p>
-        )}
-        {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
-      </div>
-
-      {/* Qty (only for box template) */}
-      {data.template === 'box' && (
+      {/* Revision + Qty type row */}
+      <div className="flex gap-4">
+        {/* Revision — exactly 2 digits */}
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium">
-            {t(lang, 'qtyType')}
+          <Label htmlFor="revision" className="text-sm font-medium">
+            {t(lang, 'revision')}
           </Label>
-          <div className="flex gap-2 mb-2">
-            {(['box', 'pallet', 'set'] as QtyType[]).map((qt) => {
-              const labelKey = qt === 'box' ? 'boxQty' : qt === 'pallet' ? 'palletQty' : 'setQty';
-              const isActive = (data.qtyType ?? 'box') === qt;
-              return (
-                <button
-                  key={qt}
-                  type="button"
-                  onClick={() => onChange({ qtyType: qt })}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card text-muted-foreground border-border hover:border-primary/50'
-                  }`}
-                >
-                  {t(lang, labelKey)}
-                </button>
-              );
-            })}
-          </div>
           <Input
-            id="boxQty"
-            value={data.boxQty ?? ''}
+            id="revision"
+            value={data.revision}
             onChange={(e) => {
-              const v = e.target.value.replace(/\D/g, '').slice(0, 6);
-              onChange({ boxQty: v ? parseInt(v) : undefined });
+              const v = e.target.value.replace(/\s/g, '').replace(/\D/g, '').slice(0, 2);
+              onChange({ revision: v });
             }}
-            placeholder={t(lang, 'boxQtyHint')}
-            className={`font-mono text-sm w-28 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            placeholder="00"
+            className={`font-mono text-sm w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            maxLength={2}
           />
-          {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
+          {data.revision.length > 0 && data.revision.length < 2 && (
+            <p className="text-xs text-destructive">{t(lang, 'invalidRevision')}</p>
+          )}
+          {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
         </div>
-      )}
+
+        {/* Qty type (only for box template) */}
+        {data.template === 'box' && (
+          <div className="flex-1 space-y-1.5">
+            <Label className="text-sm font-medium">
+              {t(lang, 'qtyType')}
+            </Label>
+            <div className="flex gap-1.5">
+              {(['box', 'pallet', 'set'] as QtyType[]).map((qt) => {
+                const labelKey = qt === 'box' ? 'boxQty' : qt === 'pallet' ? 'palletQty' : 'setQty';
+                const isActive = (data.qtyType ?? 'box') === qt;
+                return (
+                  <button
+                    key={qt}
+                    type="button"
+                    onClick={() => onChange({ qtyType: qt })}
+                    className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+                    }`}
+                  >
+                    {t(lang, labelKey)}
+                  </button>
+                );
+              })}
+            </div>
+            <Input
+              id="boxQty"
+              value={data.boxQty ?? ''}
+              onChange={(e) => {
+                const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+                onChange({ boxQty: v ? parseInt(v) : undefined });
+              }}
+              placeholder={t(lang, 'boxQtyHint')}
+              className={`font-mono text-sm w-28 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            />
+            {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
+          </div>
+        )}
+      </div>
 
       {/* Settings section */}
       <div className="pt-3 border-t border-border space-y-3">
