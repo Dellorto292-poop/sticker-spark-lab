@@ -76,6 +76,9 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           className={`font-mono text-sm w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           maxLength={2}
         />
+        {data.revision.length > 0 && data.revision.length < 2 && (
+          <p className="text-xs text-destructive">{t(lang, 'invalidRevision')}</p>
+        )}
         {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
       </div>
 
