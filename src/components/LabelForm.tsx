@@ -61,7 +61,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
       </div>
 
       {/* Revision + Qty type row */}
-      <div className="flex gap-4">
+      <div className={`grid gap-4 ${data.template === 'box' ? 'grid-cols-[100px_1fr]' : ''}`}>
         {/* Revision — exactly 2 digits */}
         <div className="space-y-1.5">
           <Label htmlFor="revision" className="text-sm font-medium">
@@ -75,7 +75,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               onChange({ revision: v });
             }}
             placeholder="00"
-            className={`font-mono text-sm w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            className={`font-mono text-sm ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
             maxLength={2}
           />
           {data.revision.length > 0 && data.revision.length < 2 && (
@@ -86,40 +86,42 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
 
         {/* Qty type (only for box template) */}
         {data.template === 'box' && (
-          <div className="flex-1 space-y-1.5">
+          <div className="space-y-1.5">
             <Label className="text-sm font-medium">
               {t(lang, 'qtyType')}
             </Label>
-            <div className="flex gap-1.5">
-              {(['box', 'pallet', 'set'] as QtyType[]).map((qt) => {
-                const labelKey = qt === 'box' ? 'boxQty' : qt === 'pallet' ? 'palletQty' : 'setQty';
-                const isActive = (data.qtyType ?? 'box') === qt;
-                return (
-                  <button
-                    key={qt}
-                    type="button"
-                    onClick={() => onChange({ qtyType: qt })}
-                    className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-                      isActive
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-card text-muted-foreground border-border hover:border-primary/50'
-                    }`}
-                  >
-                    {t(lang, labelKey)}
-                  </button>
-                );
-              })}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {(['box', 'pallet', 'set'] as QtyType[]).map((qt) => {
+                  const labelKey = qt === 'box' ? 'boxQty' : qt === 'pallet' ? 'palletQty' : 'setQty';
+                  const isActive = (data.qtyType ?? 'box') === qt;
+                  return (
+                    <button
+                      key={qt}
+                      type="button"
+                      onClick={() => onChange({ qtyType: qt })}
+                      className={`px-2.5 h-10 text-xs font-medium rounded-md border transition-colors ${
+                        isActive
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+                      }`}
+                    >
+                      {t(lang, labelKey)}
+                    </button>
+                  );
+                })}
+              </div>
+              <Input
+                id="boxQty"
+                value={data.boxQty ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  onChange({ boxQty: v ? parseInt(v) : undefined });
+                }}
+                placeholder={t(lang, 'boxQtyHint')}
+                className={`font-mono text-sm w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+              />
             </div>
-            <Input
-              id="boxQty"
-              value={data.boxQty ?? ''}
-              onChange={(e) => {
-                const v = e.target.value.replace(/\D/g, '').slice(0, 6);
-                onChange({ boxQty: v ? parseInt(v) : undefined });
-              }}
-              placeholder={t(lang, 'boxQtyHint')}
-              className={`font-mono text-sm w-28 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-            />
             {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
           </div>
         )}
