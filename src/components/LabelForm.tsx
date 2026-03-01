@@ -35,7 +35,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           placeholder={t(lang, 'itemDescriptionHint')}
           rows={2}
           maxLength={150}
-          className={`resize-none font-mono text-sm ${!data.itemDescription.trim() ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+          className={`resize-none font-mono text-sm font-bold ${!data.itemDescription.trim() ? 'border-destructive focus-visible:ring-destructive' : ''}`}
         />
         {errors.itemDescription && (
           <p className="text-xs text-destructive">{errors.itemDescription}</p>
