@@ -50,7 +50,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           id="sku"
           value={data.sku}
           onChange={(e) => {
-            const v = e.target.value.replace(/\s/g, '').toUpperCase();
+            const v = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
             onChange({ sku: v });
           }}
           placeholder={t(lang, 'skuHint')}
