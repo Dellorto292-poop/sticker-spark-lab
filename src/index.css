@@ -117,7 +117,6 @@
 @media print {
   @page {
     margin: 0;
-    size: auto;
   }
   html, body {
     margin: 0 !important;
@@ -134,11 +133,11 @@
     position: fixed !important;
     left: 0 !important;
     top: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    width: var(--print-w) !important;
+    height: var(--print-h) !important;
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
-    box-sizing: border-box !important;
+    transform: none !important;
   }
 }
