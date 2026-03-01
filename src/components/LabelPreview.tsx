@@ -18,35 +18,36 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   }, [data.sku, data.barcodeType, data.size.width]);
 
   const { width, height } = data.size;
-  // Scale to fit a fixed preview area (520×260) for consistent sizing
-  const maxW = 520;
-  const maxH = 260;
+  const isLargeFormat = height > 100; // A4 etc.
+
+  // Scale to fit preview area — larger area for large formats
+  const maxW = isLargeFormat ? 400 : 520;
+  const maxH = isLargeFormat ? 560 : 260;
   const scale = Math.min(maxW / width, maxH / height, 6);
   const scaledW = width * scale;
   const scaledH = height * scale;
 
   const fontSize = Math.max(height * 0.08, 2);
-  const descAreaRatio = 0.24;
-  const tableAreaRatio = 0.18;
+
+  // Adaptive ratios: large formats need less relative space for desc/table
+  const descAreaRatio = isLargeFormat ? 0.12 : 0.24;
+  const tableAreaRatio = isLargeFormat ? 0.08 : 0.18;
 
   // Dynamic font sizing: fits any label size and text length
   const descLen = Math.max(data.itemDescription.length, 1);
   const descAreaH = height * descAreaRatio;
-  const descAreaW = width * 0.92; // account for px-[4%] padding
+  const descAreaW = width * 0.92;
 
-  // Dynamic max lines: more lines for longer text on smaller labels
-  const minFontSize = 1.0; // mm - absolute minimum readable
-  const idealFontH = height * 0.08;
+  const minFontSize = isLargeFormat ? 3.0 : 1.0;
+  const idealFontH = height * (isLargeFormat ? 0.03 : 0.08);
   const idealLines = Math.ceil(descAreaH / (idealFontH * 1.3));
   const neededLines = Math.ceil((descLen * idealFontH * 0.6) / descAreaW);
-  const descMaxLines = Math.max(2, Math.min(Math.max(idealLines, neededLines), 6));
+  const descMaxLines = Math.max(2, Math.min(Math.max(idealLines, neededLines), isLargeFormat ? 4 : 6));
 
-  // Max font by height: must fit descMaxLines within the area
   const maxFontByHeight = descAreaH / (descMaxLines * 1.3);
-  // Max font by width: estimate chars per line (~0.6 width per char in monospace)
   const charsPerLine = Math.max(1, Math.ceil(descLen / descMaxLines));
   const maxFontByWidth = descAreaW / (charsPerLine * 0.6);
-  const titleFontSize = Math.max(minFontSize, Math.min(maxFontByHeight, maxFontByWidth, height * 0.1));
+  const titleFontSize = Math.max(minFontSize, Math.min(maxFontByHeight, maxFontByWidth, height * (isLargeFormat ? 0.04 : 0.1)));
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -95,7 +96,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               <img
                 src={barcodeUrl}
                 alt="barcode"
-                style={{ width: '90%', height: '90%', objectFit: 'fill' }}
+                style={{ width: '90%', height: '90%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
               />
             ) : (
             <div
