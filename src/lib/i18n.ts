@@ -2,7 +2,7 @@ export type Lang = 'ru' | 'en';
 
 const translations = {
   ru: {
-    appTitle: 'Генератор этикеток',
+    appTitle: 'Генератор стикеров',
     appSubtitle: 'Складская маркировка',
     selectTemplate: 'Выберите шаблон',
     unitLabel: 'Маркировка индивидуальной единицы продукта',
@@ -25,7 +25,7 @@ const translations = {
     qtyTypeHint: 'Куда наносится маркировка',
     boxQtyHint: 'Целое число',
     barcodeType: 'Тип штрих-кода',
-    labelSize: 'Размер этикетки',
+    labelSize: 'Размер стикера',
     customSize: 'Произвольный',
     width: 'Ширина (мм)',
     height: 'Высота (мм)',
@@ -37,7 +37,7 @@ const translations = {
     downloadZpl: 'Скачать ZPL',
     copyZpl: 'Копировать ZPL',
     history: 'История',
-    historyEmpty: 'Нет сохранённых этикеток',
+    historyEmpty: 'Нет сохранённых стикеров',
     repeat: 'Повторить',
     clear: 'Очистить',
     clearHistory: 'Очистить историю',
@@ -54,7 +54,7 @@ const translations = {
     skuRegexHint: 'Паттерн валидации SKU',
   },
   en: {
-    appTitle: 'Label Generator',
+    appTitle: 'Sticker Generator',
     appSubtitle: 'Warehouse labeling',
     selectTemplate: 'Select template',
     unitLabel: 'Unit Label',
@@ -77,7 +77,7 @@ const translations = {
     qtyTypeHint: 'Where the label is applied',
     boxQtyHint: 'Integer',
     barcodeType: 'Barcode type',
-    labelSize: 'Label size',
+    labelSize: 'Sticker size',
     customSize: 'Custom',
     width: 'Width (mm)',
     height: 'Height (mm)',
