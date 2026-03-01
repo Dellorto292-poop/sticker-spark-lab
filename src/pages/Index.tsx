@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
+import { printLabel } from '@/lib/print';
 import { Button } from '@/components/ui/button';
 
 import { Label } from '@/components/ui/label';
@@ -95,7 +96,7 @@ export default function Index() {
     setHistoryRefresh((n) => n + 1);
 
     if (type === 'print') {
-      window.print();
+      await printLabel(data);
       return;
     }
 
