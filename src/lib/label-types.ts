@@ -1,5 +1,6 @@
 export type TemplateType = 'unit' | 'box';
 export type BarcodeType = 'code128' | 'code39';
+export type QtyType = 'box' | 'pallet' | 'set';
 export type DPI = 203 | 300;
 
 export interface LabelSize {
@@ -23,6 +24,7 @@ export interface LabelData {
   sku: string;
   revision: string;
   boxQty?: number;
+  qtyType?: QtyType;
   barcodeType: BarcodeType;
   size: { width: number; height: number };
   dpi: DPI;

@@ -113,7 +113,9 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
             {/* Box Qty column (only for box template) */}
             {data.template === 'box' && (
               <div className="flex-1 flex flex-col justify-center px-[4%]">
-                <div className="uppercase font-medium" style={{ fontSize: `${fontSize * scale * 0.6}px` }}>Box Qty</div>
+                <div className="uppercase font-medium" style={{ fontSize: `${fontSize * scale * 0.6}px` }}>
+                  {data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty'}
+                </div>
                 <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.9}px` }}>
                   {data.boxQty ?? '—'}
                 </div>
@@ -133,7 +135,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data, showAnnotations 
               ← Barcode (SKU)
             </div>
             <div className="absolute bottom-0 left-0 bg-primary/90 text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-tr font-sans">
-              {data.template === 'box' ? 'SKU | Rev. | Box Qty' : 'SKU | Rev.'}
+              {data.template === 'box' ? `SKU | Rev. | ${data.qtyType === 'pallet' ? 'Pallet' : data.qtyType === 'set' ? 'Set' : 'Box'} Qty` : 'SKU | Rev.'}
             </div>
           </div>
         )}

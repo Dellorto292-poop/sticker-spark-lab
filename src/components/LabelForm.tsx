@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { LabelData } from '@/lib/label-types';
+import type { LabelData, QtyType } from '@/lib/label-types';
 import { SIZE_PRESETS } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
 
@@ -79,12 +79,32 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         {errors.revision && <p className="text-xs text-destructive">{errors.revision}</p>}
       </div>
 
-      {/* Box Qty (only for box template) */}
+      {/* Qty (only for box template) */}
       {data.template === 'box' && (
         <div className="space-y-1.5">
-          <Label htmlFor="boxQty" className="text-sm font-medium">
-            {t(lang, 'boxQty')}
+          <Label className="text-sm font-medium">
+            {t(lang, 'qtyType')}
           </Label>
+          <div className="flex gap-2 mb-2">
+            {(['box', 'pallet', 'set'] as QtyType[]).map((qt) => {
+              const labelKey = qt === 'box' ? 'boxQty' : qt === 'pallet' ? 'palletQty' : 'setQty';
+              const isActive = (data.qtyType ?? 'box') === qt;
+              return (
+                <button
+                  key={qt}
+                  type="button"
+                  onClick={() => onChange({ qtyType: qt })}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+                  }`}
+                >
+                  {t(lang, labelKey)}
+                </button>
+              );
+            })}
+          </div>
           <Input
             id="boxQty"
             type="number"
