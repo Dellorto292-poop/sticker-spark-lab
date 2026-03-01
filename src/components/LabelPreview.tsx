@@ -80,7 +80,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               <img
                 src={barcodeUrl}
                 alt="barcode"
-                style={{ maxWidth: '90%', height: `${height * 0.34 * scale}px`, objectFit: 'contain' }}
+                style={{ maxWidth: '90%', height: '80%', objectFit: 'contain' }}
               />
             ) : (
             <div
@@ -105,7 +105,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               </div>
             </div>
             {/* Rev column */}
-            <div className={`${data.template === 'box' ? 'flex-1 border-r border-black' : 'px-[4%]'} flex items-center gap-[4%] px-[4%]`}>
+            <div className={`flex-1 ${data.template === 'box' ? 'border-r border-black' : ''} flex items-center gap-[4%] px-[4%]`}>
               <div className="uppercase font-medium whitespace-nowrap" style={{ fontSize: `${fontSize * scale * 0.6}px` }}>Rev.</div>
               <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.9}px` }}>
                 {data.revision || '—'}
