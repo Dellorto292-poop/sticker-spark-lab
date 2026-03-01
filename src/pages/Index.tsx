@@ -42,6 +42,18 @@ export default function Index() {
   const [skuRegex, setSkuRegex] = useState(DEFAULT_SKU_REGEX);
   const previewRef = useRef<HTMLDivElement>(null);
 
+  const isFormValid = (() => {
+    if (!data.itemDescription.trim()) return false;
+    if (!data.sku) return false;
+    try {
+      const re = new RegExp(skuRegex);
+      if (!re.test(data.sku)) return false;
+    } catch { /* skip */ }
+    if (!data.revision || !/^\d{2}$/.test(data.revision)) return false;
+    if (data.template === 'box' && (!data.boxQty || data.boxQty < 1 || !Number.isInteger(data.boxQty))) return false;
+    return true;
+  })();
+
   const handleChange = useCallback((partial: Partial<LabelData>) => {
     setData((prev) => ({ ...prev, ...partial }));
     const keys = Object.keys(partial);
@@ -275,15 +287,15 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <Button onClick={() => handleExport('print')} variant="outline" className="h-11">
+              <Button onClick={() => handleExport('print')} variant="outline" className="h-11" disabled={!isFormValid}>
                 <Printer className="w-4 h-4 mr-2" />
                 {t(lang, 'print')}
               </Button>
-              <Button onClick={() => handleExport('pdf')} className="h-11">
+              <Button onClick={() => handleExport('pdf')} className="h-11" disabled={!isFormValid}>
                 <FileText className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPdf')}
               </Button>
-              <Button onClick={() => handleExport('png')} variant="outline" className="h-11">
+              <Button onClick={() => handleExport('png')} variant="outline" className="h-11" disabled={!isFormValid}>
                 <FileImage className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPng')}
               </Button>
