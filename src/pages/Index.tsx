@@ -118,13 +118,27 @@ export default function Index() {
         img.src = dataUrl;
         await new Promise((r) => (img.onload = r));
 
-        const pdf = new jsPDF({
-          orientation: data.size.width > data.size.height ? 'landscape' : 'portrait',
-          unit: 'mm',
-          format: [data.size.width, data.size.height],
-        });
-        pdf.addImage(dataUrl, 'PNG', 0, 0, data.size.width, data.size.height);
-        pdf.save(`${data.sku || 'label'}.pdf`);
+        const isA4 = data.size.width >= 190 && data.size.height >= 270;
+        
+        if (isA4) {
+          // A4: page matches label size
+          const pdf = new jsPDF({
+            orientation: data.size.width > data.size.height ? 'landscape' : 'portrait',
+            unit: 'mm',
+            format: [data.size.width, data.size.height],
+          });
+          pdf.addImage(dataUrl, 'PNG', 0, 0, data.size.width, data.size.height);
+          pdf.save(`${data.sku || 'label'}.pdf`);
+        } else {
+          // Small labels: center on A4 page
+          const pageW = 210;
+          const pageH = 297;
+          const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+          const x = (pageW - data.size.width) / 2;
+          const y = (pageH - data.size.height) / 2;
+          pdf.addImage(dataUrl, 'PNG', x, y, data.size.width, data.size.height);
+          pdf.save(`${data.sku || 'label'}.pdf`);
+        }
       }
     } catch (err) {
       console.error('Export error:', err);
