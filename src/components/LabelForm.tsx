@@ -55,7 +55,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             onChange({ sku: v });
           }}
           placeholder={t(lang, 'skuHint')}
-          className={`font-mono text-sm ${!data.sku ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+          className={`font-mono text-sm font-bold ${!data.sku ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           maxLength={12}
         />
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
@@ -76,7 +76,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               onChange({ revision: v });
             }}
             placeholder="00"
-            className={`font-mono text-sm w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            className={`font-mono text-sm font-bold w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
             maxLength={2}
           />
           {data.revision.length > 0 && data.revision.length < 2 && (
@@ -118,7 +118,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onChange({ boxQty: v ? parseInt(v) : undefined });
                 }}
                 placeholder={t(lang, 'boxQtyHint')}
-                className={`font-mono text-sm w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                className={`font-mono text-sm font-bold w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               />
               {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
             </div>
