@@ -26,7 +26,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const scaledH = height * scale;
 
   const fontSize = Math.max(height * 0.08, 2);
-  const descAreaRatio = 0.34;
+  const descAreaRatio = 0.28;
   const tableAreaRatio = 0.28;
   const descMaxLines = 3;
 
