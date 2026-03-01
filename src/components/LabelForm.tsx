@@ -55,7 +55,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           }}
           placeholder={t(lang, 'skuHint')}
           className="font-mono text-sm"
-          maxLength={30}
+          maxLength={12}
         />
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
       </div>
