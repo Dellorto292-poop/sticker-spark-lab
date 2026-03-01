@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import LabelForm from '@/components/LabelForm';
@@ -14,7 +14,7 @@ import type { LabelData, TemplateType } from '@/lib/label-types';
 import { generateId, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import {
   Printer, FileText, FileImage, Package, Box,
-  ArrowLeft, Languages, Eye
+  ArrowLeft, Languages
 } from 'lucide-react';
 
 function createDefaultData(template: TemplateType): LabelData {
@@ -37,7 +37,7 @@ export default function Index() {
   const [lang, setLang] = useState<Lang>('ru');
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(null);
   const [data, setData] = useState<LabelData>(createDefaultData('unit'));
-  const [showAnnotations, setShowAnnotations] = useState(false);
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [historyRefresh, setHistoryRefresh] = useState(0);
   const [skuRegex, setSkuRegex] = useState(DEFAULT_SKU_REGEX);
@@ -234,17 +234,6 @@ export default function Index() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
-              <Label htmlFor="annotations" className="text-xs text-muted-foreground cursor-pointer">
-                {t(lang, 'annotations')}
-              </Label>
-              <Switch
-                id="annotations"
-                checked={showAnnotations}
-                onCheckedChange={setShowAnnotations}
-              />
-            </div>
             <Button
               variant="outline"
               size="sm"
@@ -281,7 +270,7 @@ export default function Index() {
             <div className="bg-card border border-border rounded-xl p-5 sticky top-6">
               <h3 className="text-sm font-semibold mb-4">{t(lang, 'preview')}</h3>
               <div className="flex items-center justify-center bg-muted/30 rounded-lg p-6" style={{ minHeight: '320px' }}>
-                <LabelPreview ref={previewRef} data={data} showAnnotations={showAnnotations} />
+                <LabelPreview ref={previewRef} data={data} />
               </div>
             </div>
 
