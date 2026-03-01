@@ -99,9 +99,9 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="box">{t(lang, 'boxQty')}</SelectItem>
-                  <SelectItem value="pallet">{t(lang, 'palletQty')}</SelectItem>
-                  <SelectItem value="set">{t(lang, 'setQty')}</SelectItem>
+                  <SelectItem value="box">{t(lang, 'boxOption')}</SelectItem>
+                  <SelectItem value="pallet">{t(lang, 'palletOption')}</SelectItem>
+                  <SelectItem value="set">{t(lang, 'setOption')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
