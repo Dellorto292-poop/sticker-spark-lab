@@ -181,7 +181,7 @@ export default function Index() {
               <span>{lang === 'ru' ? 'Работает офлайн после первой загрузки — можно установить как приложение' : 'Works offline after first load — can be installed as an app'}</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <button
                 onClick={() => selectTemplate('unit')}
                 className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left flex flex-col items-start gap-3"
