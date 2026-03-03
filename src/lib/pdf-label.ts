@@ -140,8 +140,8 @@ function drawBarcode(pdf: jsPDF, encoded: BarcodeBars, x: number, y: number, are
 }
 
 /**
- * Generate a vector PDF sized exactly to the label dimensions.
- * Opens in a new tab for printing on thermal printers.
+ * Generate a vector PDF sized exactly to the label dimensions
+ * and immediately open the browser print dialog via a hidden iframe.
  */
 export function generateThermalPdf(data: LabelData): void {
   const { width, height } = data.size;
@@ -153,7 +153,33 @@ export function generateThermalPdf(data: LabelData): void {
   });
 
   drawLabel(pdf, 0, 0, data);
-  pdf.save(`${data.sku || 'label'}-thermal.pdf`);
+
+  const blobUrl = pdf.output('bloburl') as unknown as string;
+
+  // Remove any previous print iframe
+  const oldFrame = document.getElementById('thermal-print-frame');
+  if (oldFrame) oldFrame.remove();
+
+  const iframe = document.createElement('iframe');
+  iframe.id = 'thermal-print-frame';
+  iframe.style.position = 'fixed';
+  iframe.style.top = '-10000px';
+  iframe.style.left = '-10000px';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = 'none';
+  iframe.src = blobUrl;
+
+  iframe.onload = () => {
+    try {
+      iframe.contentWindow?.print();
+    } catch {
+      // Fallback: open in new tab if iframe print fails
+      window.open(blobUrl, '_blank');
+    }
+  };
+
+  document.body.appendChild(iframe);
 }
 
 /**
