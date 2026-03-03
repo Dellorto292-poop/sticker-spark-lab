@@ -177,8 +177,13 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               onBlur={() => {
                 if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
               }}
-              className="text-sm font-mono"
+              className={`text-sm font-mono ${data.size.width > 190 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
             />
+            {data.size.width > 190 && (
+              <p className="text-xs text-destructive">
+                {lang === 'ru' ? 'Макс. ширина 190 мм' : 'Max width 190 mm'}
+              </p>
+            )}
           </div>
           <div className="flex-1 space-y-1">
             <Label className="text-xs">{t(lang, 'height')}</Label>
@@ -193,8 +198,13 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               onBlur={() => {
                 if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
               }}
-              className="text-sm font-mono"
+              className={`text-sm font-mono ${data.size.height > 277 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
             />
+            {data.size.height > 277 && (
+              <p className="text-xs text-destructive">
+                {lang === 'ru' ? 'Макс. высота 277 мм' : 'Max height 277 mm'}
+              </p>
+            )}
           </div>
           </div>
         </div>
@@ -244,8 +254,13 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onBlur={() => {
                     if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
                   }}
-                  className="text-sm font-mono"
+                  className={`text-sm font-mono ${data.size.width > 190 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {data.size.width > 190 && (
+                  <p className="text-xs text-destructive">
+                    {lang === 'ru' ? 'Макс. ширина 190 мм' : 'Max width 190 mm'}
+                  </p>
+                )}
               </div>
               <div className="flex-1 space-y-1">
                 <Label className="text-xs">{t(lang, 'height')}</Label>
@@ -260,8 +275,13 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onBlur={() => {
                     if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
                   }}
-                  className="text-sm font-mono"
+                  className={`text-sm font-mono ${data.size.height > 277 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {data.size.height > 277 && (
+                  <p className="text-xs text-destructive">
+                    {lang === 'ru' ? 'Макс. высота 277 мм' : 'Max height 277 mm'}
+                  </p>
+                )}
               </div>
             </div>
           )}
