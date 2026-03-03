@@ -57,7 +57,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
             onChange({ sku: v });
           }}
           placeholder={t(lang, 'skuHint')}
-          className={`font-mono text-sm font-bold ${!data.sku ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+          className={`font-mono text-sm font-bold ${errors.sku ? 'border-destructive focus-visible:ring-destructive' : ''}`}
           maxLength={12}
         />
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
