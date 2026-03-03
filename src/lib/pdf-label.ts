@@ -51,8 +51,11 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const isDesign = data.template === 'design';
   const isCompactFormat = h <= 24;
 
+  const isBox = data.template === 'box';
   const descRatio = isDesign ? 0 : (isLarge ? 0.25 : 0.24);
-  const tableRatio = isLarge ? 0.15 : (isCompactFormat ? 0.24 : 0.18);
+  const tableRatio = isBox
+    ? (isLarge ? 0.15 : (isCompactFormat ? 0.24 : 0.18))
+    : (isLarge ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
   const descH = h * descRatio;
   const tableH = h * tableRatio;
 
@@ -117,37 +120,67 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const labelFontScale = isCompactFormat ? 0.4 : 0.5;
   const valueFontScale = isCompactFormat ? 0.7 : 0.85;
 
-  const cols: { label: string; value: string }[] = [
-    { label: 'SKU', value: data.sku || '—' },
-    { label: 'REV.', value: data.revision || '—' },
-  ];
-  if (data.template === 'box') {
+  if (isBox) {
+    // Box template: vertical label/value columns (SKU, Rev, Qty)
+    const cols: { label: string; value: string }[] = [
+      { label: 'SKU', value: data.sku || '—' },
+      { label: 'REV.', value: data.revision || '—' },
+    ];
     const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
     cols.push({ label: qtyLabel, value: String(data.boxQty ?? '—') });
-  }
 
-  const colW = w / cols.length;
-  for (let i = 0; i < cols.length; i++) {
-    const cx = x + i * colW + colW / 2;
-
-    // Label
-    pdf.setFont('courier', 'bold');
-    pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
-    pdf.setTextColor(100);
-    pdf.text(cols[i].label, cx, tableTop + tableH * 0.3, { align: 'center' });
-
-    // Value
-    pdf.setFont('courier', 'bold');
-    pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
-    pdf.setTextColor(0);
-    pdf.text(cols[i].value, cx, tableTop + tableH * 0.76, { align: 'center' });
-
-    // Column separator
-    if (i < cols.length - 1) {
-      pdf.setLineWidth(0.3);
-      pdf.setDrawColor(0);
-      pdf.line(x + (i + 1) * colW, tableTop, x + (i + 1) * colW, y + h);
+    const colW = w / cols.length;
+    for (let i = 0; i < cols.length; i++) {
+      const cx = x + i * colW + colW / 2;
+      pdf.setFont('courier', 'bold');
+      pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
+      pdf.setTextColor(100);
+      pdf.text(cols[i].label, cx, tableTop + tableH * 0.3, { align: 'center' });
+      pdf.setFont('courier', 'bold');
+      pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
+      pdf.setTextColor(0);
+      pdf.text(cols[i].value, cx, tableTop + tableH * 0.76, { align: 'center' });
+      if (i < cols.length - 1) {
+        pdf.setLineWidth(0.3);
+        pdf.setDrawColor(0);
+        pdf.line(x + (i + 1) * colW, tableTop, x + (i + 1) * colW, y + h);
+      }
     }
+  } else {
+    // Individual/design: horizontal "SKU value | Rev. value"
+    const halfW = w / 2;
+    const midY = tableTop + tableH * 0.6;
+    const labelFontPt = baseFontMm * labelFontScale * MM_TO_PT;
+    const valueFontPt = baseFontMm * valueFontScale * MM_TO_PT;
+
+    // SKU
+    pdf.setFont('courier', 'bold');
+    pdf.setFontSize(labelFontPt);
+    pdf.setTextColor(100);
+    const skuLabelW = pdf.getTextWidth('SKU ');
+    const skuLabelX = x + halfW * 0.15;
+    pdf.text('SKU', skuLabelX, midY);
+    pdf.setFont('courier', 'bold');
+    pdf.setFontSize(valueFontPt);
+    pdf.setTextColor(0);
+    pdf.text(data.sku || '—', skuLabelX + skuLabelW, midY);
+
+    // Separator
+    pdf.setLineWidth(0.3);
+    pdf.setDrawColor(0);
+    pdf.line(x + halfW, tableTop, x + halfW, y + h);
+
+    // Rev.
+    pdf.setFont('courier', 'bold');
+    pdf.setFontSize(labelFontPt);
+    pdf.setTextColor(100);
+    const revLabelW = pdf.getTextWidth('Rev. ');
+    const revLabelX = x + halfW + halfW * 0.15;
+    pdf.text('Rev.', revLabelX, midY);
+    pdf.setFont('courier', 'bold');
+    pdf.setFontSize(valueFontPt);
+    pdf.setTextColor(0);
+    pdf.text(data.revision || '—', revLabelX + revLabelW, midY);
   }
 
   pdf.setTextColor(0);

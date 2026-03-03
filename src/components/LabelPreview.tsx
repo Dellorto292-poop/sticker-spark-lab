@@ -31,10 +31,14 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
   const isDesign = data.template === 'design';
   const isCompactFormat = height <= 24;
+  const isBoxTemplate = data.template === 'box';
 
   // Adaptive ratios: large formats need less relative space for desc/table
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
-  const tableAreaRatio = isLargeFormat ? 0.15 : (isCompactFormat ? 0.24 : 0.18);
+  // Non-box templates use compact horizontal layout → smaller table area
+  const tableAreaRatio = isBoxTemplate
+    ? (isLargeFormat ? 0.15 : (isCompactFormat ? 0.24 : 0.18))
+    : (isLargeFormat ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
 
   // Dynamic font sizing (only used when description is shown)
   const descLen = Math.max(data.itemDescription.length, 1);
@@ -120,30 +124,48 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             className="absolute bottom-0 left-0 right-0 border-t-2 border-black flex"
             style={{ height: `${height * tableAreaRatio * scale}px` }}
           >
-            {/* SKU column */}
-            <div className="flex-1 border-r border-black flex flex-col items-center justify-center leading-none">
-              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>SKU</div>
-              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
-                {data.sku || '—'}
-              </div>
-            </div>
-            {/* Rev column */}
-            <div className={`flex-1 ${data.template === 'box' ? 'border-r border-black' : ''} flex flex-col items-center justify-center leading-none`}>
-              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>Rev.</div>
-              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
-                {data.revision || '—'}
-              </div>
-            </div>
-            {/* Box Qty column (only for box template) */}
-            {data.template === 'box' && (
-              <div className="flex-1 flex flex-col items-center justify-center leading-none">
-                <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>
-                  {data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty'}
+            {isBoxTemplate ? (
+              <>
+                {/* SKU column */}
+                <div className="flex-1 border-r border-black flex flex-col items-center justify-center leading-none">
+                  <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>SKU</div>
+                  <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
+                    {data.sku || '—'}
+                  </div>
                 </div>
-                <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
-                  {data.boxQty ?? '—'}
+                {/* Rev column */}
+                <div className="flex-1 border-r border-black flex flex-col items-center justify-center leading-none">
+                  <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>Rev.</div>
+                  <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
+                    {data.revision || '—'}
+                  </div>
                 </div>
-              </div>
+                {/* Box Qty column */}
+                <div className="flex-1 flex flex-col items-center justify-center leading-none">
+                  <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>
+                    {data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty'}
+                  </div>
+                  <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
+                    {data.boxQty ?? '—'}
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* Horizontal compact layout for individual/design: "SKU value | Rev. value" */
+              <>
+                <div className="flex-1 border-r border-black flex items-center justify-center gap-[2%] leading-none px-[3%]">
+                  <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>SKU</div>
+                  <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
+                    {data.sku || '—'}
+                  </div>
+                </div>
+                <div className="flex-1 flex items-center justify-center gap-[2%] leading-none px-[3%]">
+                  <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>Rev.</div>
+                  <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
+                    {data.revision || '—'}
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
