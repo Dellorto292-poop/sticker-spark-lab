@@ -183,38 +183,32 @@ export default function Index() {
             <div className="grid grid-cols-3 gap-4">
               <button
                 onClick={() => selectTemplate('unit')}
-                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left space-y-3"
-              >
-                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                  <Package className="w-5 h-5 text-secondary-foreground group-hover:text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm">{t(lang, 'unitLabel')}</h3>
-                </div>
-              </button>
-
-              <button
-                onClick={() => selectTemplate('box')}
-                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left space-y-3"
+                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left flex flex-col items-start gap-3"
               >
                 <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                   <Box className="w-5 h-5 text-secondary-foreground group-hover:text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm">{t(lang, 'boxLabel')}</h3>
+                <h3 className="font-semibold text-sm">{t(lang, 'unitLabel')}</h3>
+              </button>
+
+              <button
+                onClick={() => selectTemplate('box')}
+                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left flex flex-col items-start gap-3"
+              >
+                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Box className="w-5 h-5 text-secondary-foreground group-hover:text-primary" />
                 </div>
+                <h3 className="font-semibold text-sm">{t(lang, 'boxLabel')}</h3>
               </button>
 
               <button
                 onClick={() => selectTemplate('design')}
-                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left space-y-3"
+                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left flex flex-col items-start gap-3"
               >
                 <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                   <PenTool className="w-5 h-5 text-secondary-foreground group-hover:text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm">{t(lang, 'designLabel')}</h3>
-                </div>
+                <h3 className="font-semibold text-sm">{t(lang, 'designLabel')}</h3>
               </button>
             </div>
 
