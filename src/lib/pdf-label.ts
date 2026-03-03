@@ -141,9 +141,19 @@ function drawBarcode(pdf: jsPDF, encoded: BarcodeBars, x: number, y: number, are
 
 /**
  * Generate a vector PDF sized exactly to the label dimensions
- * and immediately open the browser print dialog via a hidden iframe.
+ * and immediately open the browser print dialog.
+ * The window is opened synchronously (preserving user gesture),
+ * then the PDF is embedded as an <embed> and print() is called.
  */
 export function generateThermalPdf(data: LabelData): void {
+  // Open window IMMEDIATELY in click context to avoid popup blocker
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    // Fallback: just download
+    downloadVectorPdf(data);
+    return;
+  }
+
   const { width, height } = data.size;
 
   const pdf = new jsPDF({
@@ -156,30 +166,17 @@ export function generateThermalPdf(data: LabelData): void {
 
   const blobUrl = pdf.output('bloburl') as unknown as string;
 
-  // Remove any previous print iframe
-  const oldFrame = document.getElementById('thermal-print-frame');
-  if (oldFrame) oldFrame.remove();
-
-  const iframe = document.createElement('iframe');
-  iframe.id = 'thermal-print-frame';
-  iframe.style.position = 'fixed';
-  iframe.style.top = '-10000px';
-  iframe.style.left = '-10000px';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
-  iframe.style.border = 'none';
-  iframe.src = blobUrl;
-
-  iframe.onload = () => {
-    try {
-      iframe.contentWindow?.print();
-    } catch {
-      // Fallback: open in new tab if iframe print fails
-      window.open(blobUrl, '_blank');
-    }
-  };
-
-  document.body.appendChild(iframe);
+  printWindow.document.write(`<!DOCTYPE html>
+<html><head><title>Print Label</title>
+<style>body{margin:0;overflow:hidden}embed{width:100%;height:100vh}</style>
+</head><body>
+<embed src="${blobUrl}" type="application/pdf" width="100%" height="100%">
+<script>
+  // Wait for PDF to render, then trigger print
+  setTimeout(function(){ window.print(); }, 600);
+</script>
+</body></html>`);
+  printWindow.document.close();
 }
 
 /**
