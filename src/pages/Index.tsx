@@ -9,9 +9,7 @@ import { toast } from 'sonner';
 import LabelForm from '@/components/LabelForm';
 import LabelPreview from '@/components/LabelPreview';
 import A4PrintDialog from '@/components/A4PrintDialog';
-import HistoryPanel from '@/components/HistoryPanel';
 import { t, type Lang } from '@/lib/i18n';
-import { addToHistory } from '@/lib/history';
 import type { LabelData, TemplateType } from '@/lib/label-types';
 import { generateId, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import {
@@ -41,7 +39,6 @@ export default function Index() {
   const [data, setData] = useState<LabelData>(createDefaultData('unit'));
   
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [historyRefresh, setHistoryRefresh] = useState(0);
   const [skuRegex, setSkuRegex] = useState(DEFAULT_SKU_REGEX);
   const [a4DialogOpen, setA4DialogOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -94,10 +91,6 @@ export default function Index() {
   const handleExport = async (type: 'pdf' | 'png' | 'thermal' | 'a4') => {
     if (!validate()) return;
 
-    const entry = { ...data, id: generateId(), createdAt: Date.now() };
-    addToHistory(entry);
-    setHistoryRefresh((n) => n + 1);
-
     try {
       if (type === 'thermal') {
         await generateThermalPdf(data);
@@ -130,14 +123,6 @@ export default function Index() {
       console.error('Export error:', err);
       toast.error(lang === 'ru' ? 'Ошибка экспорта' : 'Export error');
     }
-  };
-
-  const handleRepeat = (item: LabelData) => {
-    if (item.sku) {
-      setData({ ...item, id: generateId(), createdAt: Date.now() });
-      setSelectedTemplate(item.template);
-    }
-    setHistoryRefresh((n) => n + 1);
   };
 
   const selectTemplate = (tmpl: TemplateType) => {
@@ -214,9 +199,6 @@ export default function Index() {
               </button>
             </div>
 
-            <div className="pt-4 border-t border-border">
-              <HistoryPanel lang={lang} onRepeat={handleRepeat} refreshKey={historyRefresh} />
-            </div>
           </div>
         </div>
       </div>
@@ -274,9 +256,6 @@ export default function Index() {
               />
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-5">
-              <HistoryPanel lang={lang} onRepeat={handleRepeat} refreshKey={historyRefresh} />
-            </div>
           </div>
 
           {/* Right: Preview & Actions */}
