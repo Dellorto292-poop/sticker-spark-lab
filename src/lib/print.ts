@@ -141,7 +141,7 @@ export async function printLabel(data: LabelData): Promise<void> {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1mm 2mm;
+      padding: 2mm 1mm;
     }
     
     .barcode img {
