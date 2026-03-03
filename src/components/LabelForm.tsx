@@ -44,7 +44,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         </div>
       )}
 
-      {/* SKU — NO auto-correction */}
+      {/* SKU */}
       <div className="space-y-1.5">
         <Label htmlFor="sku" className="text-sm font-medium">
           {t(lang, 'sku')}
@@ -63,7 +63,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         {errors.sku && <p className="text-xs text-destructive">{errors.sku}</p>}
       </div>
 
-      {/* Revision + Qty/Size row */}
+      {/* Revision + Qty + Size row */}
       <div className="flex gap-4 flex-wrap">
         {/* Revision */}
         <div className="space-y-1.5 shrink-0">
@@ -127,36 +127,34 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           </>
         )}
 
-        {/* Label size inline for unit/design template */}
-        {(data.template === 'unit' || data.template === 'design') && (
-          <div className="space-y-1.5 flex-1 min-w-[140px]">
-            <Label className="text-sm font-medium">{t(lang, 'labelSize')}</Label>
-            <Select
-              value={sizePresetKey}
-              onValueChange={(v) => {
-                if (v === 'custom') { onChange({ size: { width: 0, height: 0 } }); return; }
-                const [w, h] = v.split('x').map(Number);
-                onChange({ size: { width: w, height: h } });
-              }}
-            >
-              <SelectTrigger className="w-full font-bold">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {presets.map((p) => (
-                  <SelectItem key={`${p.width}x${p.height}`} value={`${p.width}x${p.height}`}>
-                    {p.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="custom">{t(lang, 'customSize')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {/* Label size — all templates */}
+        <div className="space-y-1.5 flex-1 min-w-[140px]">
+          <Label className="text-sm font-medium">{t(lang, 'labelSize')}</Label>
+          <Select
+            value={sizePresetKey}
+            onValueChange={(v) => {
+              if (v === 'custom') { onChange({ size: { width: 0, height: 0 } }); return; }
+              const [w, h] = v.split('x').map(Number);
+              onChange({ size: { width: w, height: h } });
+            }}
+          >
+            <SelectTrigger className="w-full font-bold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {presets.map((p) => (
+                <SelectItem key={`${p.width}x${p.height}`} value={`${p.width}x${p.height}`}>
+                  {p.name}
+                </SelectItem>
+              ))}
+              <SelectItem value="custom">{t(lang, 'customSize')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Custom size inputs for unit template */}
-      {(data.template === 'unit' || data.template === 'design') && sizePresetKey === 'custom' && (
+      {/* Custom size inputs */}
+      {sizePresetKey === 'custom' && (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
             {lang === 'ru'
@@ -164,127 +162,49 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               : 'Max printable size on A4: 190 × 277 mm (10 mm margins)'}
           </p>
           <div className="flex gap-2">
-          <div className="flex-1 space-y-1">
-            <Label className="text-xs">{t(lang, 'width')}</Label>
-            <Input
-              inputMode="numeric"
-              placeholder="мм"
-              value={data.size.width || ''}
-              onChange={(e) => {
-                const v = e.target.value.replace(/\D/g, '');
-                onChange({ size: { ...data.size, width: v ? parseInt(v) : 0 } });
-              }}
-              onBlur={() => {
-                if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
-              }}
-              className={`text-sm font-mono ${data.size.width > 190 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-            />
-            {data.size.width > 190 && (
-              <p className="text-xs text-destructive">
-                {lang === 'ru' ? 'Макс. ширина 190 мм' : 'Max width 190 mm'}
-              </p>
-            )}
-          </div>
-          <div className="flex-1 space-y-1">
-            <Label className="text-xs">{t(lang, 'height')}</Label>
-            <Input
-              inputMode="numeric"
-              placeholder="мм"
-              value={data.size.height || ''}
-              onChange={(e) => {
-                const v = e.target.value.replace(/\D/g, '');
-                onChange({ size: { ...data.size, height: v ? parseInt(v) : 0 } });
-              }}
-              onBlur={() => {
-                if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
-              }}
-              className={`text-sm font-mono ${data.size.height > 277 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-            />
-            {data.size.height > 277 && (
-              <p className="text-xs text-destructive">
-                {lang === 'ru' ? 'Макс. высота 277 мм' : 'Max height 277 mm'}
-              </p>
-            )}
-          </div>
-          </div>
-        </div>
-      )}
-
-      {/* Settings section (only for box template) */}
-      {data.template === 'box' && (
-        <div className="pt-3 border-t border-border space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t(lang, 'settings')}
-          </h3>
-          <div className="flex items-center justify-between">
-            <Label className="text-sm">{t(lang, 'labelSize')}</Label>
-            <Select
-              value={sizePresetKey}
-              onValueChange={(v) => {
-                if (v === 'custom') { onChange({ size: { width: 0, height: 0 } }); return; }
-                const [w, h] = v.split('x').map(Number);
-                onChange({ size: { width: w, height: h } });
-              }}
-            >
-              <SelectTrigger className="w-36 font-bold">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {presets.map((p) => (
-                  <SelectItem key={`${p.width}x${p.height}`} value={`${p.width}x${p.height}`}>
-                    {p.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="custom">{t(lang, 'customSize')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {sizePresetKey === 'custom' && (
-            <div className="flex gap-2">
-              <div className="flex-1 space-y-1">
-                <Label className="text-xs">{t(lang, 'width')}</Label>
-                <Input
-                  inputMode="numeric"
-                  placeholder="мм"
-                  value={data.size.width || ''}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, '');
-                    onChange({ size: { ...data.size, width: v ? parseInt(v) : 0 } });
-                  }}
-                  onBlur={() => {
-                    if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
-                  }}
-                  className={`text-sm font-mono ${data.size.width > 190 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-                />
-                {data.size.width > 190 && (
-                  <p className="text-xs text-destructive">
-                    {lang === 'ru' ? 'Макс. ширина 190 мм' : 'Max width 190 mm'}
-                  </p>
-                )}
-              </div>
-              <div className="flex-1 space-y-1">
-                <Label className="text-xs">{t(lang, 'height')}</Label>
-                <Input
-                  inputMode="numeric"
-                  placeholder="мм"
-                  value={data.size.height || ''}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, '');
-                    onChange({ size: { ...data.size, height: v ? parseInt(v) : 0 } });
-                  }}
-                  onBlur={() => {
-                    if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
-                  }}
-                  className={`text-sm font-mono ${data.size.height > 277 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-                />
-                {data.size.height > 277 && (
-                  <p className="text-xs text-destructive">
-                    {lang === 'ru' ? 'Макс. высота 277 мм' : 'Max height 277 mm'}
-                  </p>
-                )}
-              </div>
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs">{t(lang, 'width')}</Label>
+              <Input
+                inputMode="numeric"
+                placeholder="мм"
+                value={data.size.width || ''}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '');
+                  onChange({ size: { ...data.size, width: v ? parseInt(v) : 0 } });
+                }}
+                onBlur={() => {
+                  if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
+                }}
+                className={`text-sm font-mono ${data.size.width > 190 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+              />
+              {data.size.width > 190 && (
+                <p className="text-xs text-destructive">
+                  {lang === 'ru' ? 'Макс. ширина 190 мм' : 'Max width 190 mm'}
+                </p>
+              )}
             </div>
-          )}
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs">{t(lang, 'height')}</Label>
+              <Input
+                inputMode="numeric"
+                placeholder="мм"
+                value={data.size.height || ''}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '');
+                  onChange({ size: { ...data.size, height: v ? parseInt(v) : 0 } });
+                }}
+                onBlur={() => {
+                  if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
+                }}
+                className={`text-sm font-mono ${data.size.height > 277 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+              />
+              {data.size.height > 277 && (
+                <p className="text-xs text-destructive">
+                  {lang === 'ru' ? 'Макс. высота 277 мм' : 'Max height 277 mm'}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
