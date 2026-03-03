@@ -279,16 +279,6 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Button onClick={() => handleExport('thermal')} variant="outline" className="h-12 flex-col gap-0.5 py-1" disabled={!isFormValid}>
-                <span className="flex items-center gap-2"><Printer className="w-4 h-4" />{t(lang, 'printThermal')}</span>
-                <span className="text-[10px] text-muted-foreground font-normal">1:1 · Zebra / TSC</span>
-              </Button>
-              <Button onClick={() => handleExport('a4')} variant="outline" className="h-12 flex-col gap-0.5 py-1" disabled={!isFormValid}>
-                <span className="flex items-center gap-2"><Grid3X3 className="w-4 h-4" />{t(lang, 'printA4')}</span>
-                <span className="text-[10px] text-muted-foreground font-normal">{lang === 'ru' ? 'Сетка на листе' : 'Grid on sheet'}</span>
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
               <Button onClick={() => handleExport('pdf')} variant="outline" className="h-11" disabled={!isFormValid}>
                 <FileText className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPdf')}
@@ -298,13 +288,6 @@ export default function Index() {
                 {t(lang, 'downloadPng')}
               </Button>
             </div>
-
-            <A4PrintDialog
-              open={a4DialogOpen}
-              onOpenChange={setA4DialogOpen}
-              data={data}
-              lang={lang}
-            />
           </div>
         </div>
       </div>
