@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { LabelData, QtyType } from '@/lib/label-types';
+import type { LabelData, QtyType, BarcodeType } from '@/lib/label-types';
 import { SIZE_PRESETS, SIZE_PRESETS_BOX, SIZE_PRESETS_DESIGN } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
 
@@ -205,6 +205,27 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Barcode type (design template) */}
+      {data.template === 'design' && (
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium">
+            {lang === 'ru' ? 'Кодировка' : 'Barcode type'}
+          </Label>
+          <Select
+            value={data.barcodeType}
+            onValueChange={(v) => onChange({ barcodeType: v as BarcodeType })}
+          >
+            <SelectTrigger className="w-full font-bold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="code39">Code 39</SelectItem>
+              <SelectItem value="code128">Code 128</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       )}
 
