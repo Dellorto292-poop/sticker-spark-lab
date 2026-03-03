@@ -17,8 +17,11 @@ export async function printLabel(data: LabelData): Promise<void> {
   }
 
   // Ratios (must match LabelPreview)
+  const isBoxTemplate = data.template === 'box';
   const descAreaRatio = isLargeFormat ? 0.25 : 0.24;
-  const tableAreaRatio = isLargeFormat ? 0.15 : 0.18;
+  const tableAreaRatio = isBoxTemplate
+    ? (isLargeFormat ? 0.15 : 0.18)
+    : (isLargeFormat ? 0.10 : 0.12);
   const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
 
   // Title font sizing (simplified version of LabelPreview logic)
@@ -39,27 +42,39 @@ export async function printLabel(data: LabelData): Promise<void> {
   const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
 
   // Build table columns
-  const cols = [
-    { label: 'SKU', value: data.sku || '—' },
-    { label: 'REV.', value: data.revision || '—' },
-  ];
-  if (data.template === 'box') {
-    cols.push({ label: qtyLabel, value: String(data.boxQty ?? '—') });
+  let colsHtml: string;
+  if (isBoxTemplate) {
+    const cols = [
+      { label: 'SKU', value: data.sku || '—' },
+      { label: 'REV.', value: data.revision || '—' },
+      { label: qtyLabel, value: String(data.boxQty ?? '—') },
+    ];
+    colsHtml = cols.map((col, i) => `
+      <div style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        ${i < cols.length - 1 ? 'border-right: 0.3mm solid #000;' : ''}
+      ">
+        <div style="font-size: ${fontSize * 0.5}mm; font-weight: bold; opacity: 0.7; text-transform: uppercase; white-space: nowrap;">${col.label}</div>
+        <div style="font-size: ${fontSize * 0.85}mm; font-weight: bold;">${col.value}</div>
+      </div>
+    `).join('');
+  } else {
+    // Horizontal compact: "SKU value | Rev. value"
+    colsHtml = `
+      <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:2%; padding:0 3%; border-right:0.3mm solid #000;">
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:bold; opacity:0.7; text-transform:uppercase; white-space:nowrap;">SKU</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.sku || '—')}</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:2%; padding:0 3%;">
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:bold; opacity:0.7; text-transform:uppercase; white-space:nowrap;">Rev.</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.revision || '—')}</div>
+      </div>
+    `;
   }
-
-  const colsHtml = cols.map((col, i) => `
-    <div style="
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      ${i < cols.length - 1 ? 'border-right: 0.3mm solid #000;' : ''}
-    ">
-      <div style="font-size: ${fontSize * 0.5}mm; font-weight: bold; opacity: 0.7; text-transform: uppercase; white-space: nowrap;">${col.label}</div>
-      <div style="font-size: ${fontSize * 0.85}mm; font-weight: bold;">${col.value}</div>
-    </div>
-  `).join('');
 
   const html = `<!DOCTYPE html>
 <html>
