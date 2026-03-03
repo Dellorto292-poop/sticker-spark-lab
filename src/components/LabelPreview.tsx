@@ -27,7 +27,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const scaledW = width * scale;
   const scaledH = height * scale;
 
-  const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
+  const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.12, 2.5);
 
   const isDesign = data.template === 'design';
 

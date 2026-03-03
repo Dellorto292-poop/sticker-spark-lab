@@ -91,7 +91,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   pdf.setLineWidth(0.5);
   pdf.line(x, tableTop, x + w, tableTop);
 
-  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.08, 2);
+  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.12, 2.5);
 
   const cols: { label: string; value: string }[] = [
     { label: 'SKU', value: data.sku || '—' },
