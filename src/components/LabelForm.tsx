@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { LabelData, QtyType } from '@/lib/label-types';
-import { SIZE_PRESETS, SIZE_PRESETS_BOX } from '@/lib/label-types';
+import { SIZE_PRESETS, SIZE_PRESETS_BOX, SIZE_PRESETS_DESIGN } from '@/lib/label-types';
 import { t, type Lang } from '@/lib/i18n';
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function LabelForm({ data, onChange, lang, errors }: Props) {
-  const presets = data.template === 'box' ? SIZE_PRESETS_BOX : SIZE_PRESETS;
+  const presets = data.template === 'box' ? SIZE_PRESETS_BOX : data.template === 'design' ? SIZE_PRESETS_DESIGN : SIZE_PRESETS;
   const sizePresetKey = presets.find(
     (p) => p.width === data.size.width && p.height === data.size.height
   )
@@ -23,24 +23,26 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Item Description */}
-      <div className="space-y-1.5">
-        <Label htmlFor="itemDescription" className="text-sm font-medium">
-          {t(lang, 'itemDescription')}
-        </Label>
-        <Textarea
-          id="itemDescription"
-          value={data.itemDescription}
-          onChange={(e) => onChange({ itemDescription: e.target.value })}
-          placeholder={t(lang, 'itemDescriptionHint')}
-          rows={2}
-          maxLength={150}
-          className={`resize-none font-mono text-sm font-bold ${!data.itemDescription.trim() ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-        />
-        {errors.itemDescription && (
-          <p className="text-xs text-destructive">{errors.itemDescription}</p>
-        )}
-      </div>
+      {/* Item Description (not for design template) */}
+      {data.template !== 'design' && (
+        <div className="space-y-1.5">
+          <Label htmlFor="itemDescription" className="text-sm font-medium">
+            {t(lang, 'itemDescription')}
+          </Label>
+          <Textarea
+            id="itemDescription"
+            value={data.itemDescription}
+            onChange={(e) => onChange({ itemDescription: e.target.value })}
+            placeholder={t(lang, 'itemDescriptionHint')}
+            rows={2}
+            maxLength={150}
+            className={`resize-none font-mono text-sm font-bold ${!data.itemDescription.trim() ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+          />
+          {errors.itemDescription && (
+            <p className="text-xs text-destructive">{errors.itemDescription}</p>
+          )}
+        </div>
+      )}
 
       {/* SKU — NO auto-correction */}
       <div className="space-y-1.5">
@@ -125,8 +127,8 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
           </>
         )}
 
-        {/* Label size inline for unit template */}
-        {data.template === 'unit' && (
+        {/* Label size inline for unit/design template */}
+        {(data.template === 'unit' || data.template === 'design') && (
           <div className="space-y-1.5 flex-1 min-w-[140px]">
             <Label className="text-sm font-medium">{t(lang, 'labelSize')}</Label>
             <Select
@@ -154,7 +156,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
       </div>
 
       {/* Custom size inputs for unit template */}
-      {data.template === 'unit' && sizePresetKey === 'custom' && (
+      {(data.template === 'unit' || data.template === 'design') && sizePresetKey === 'custom' && (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
             {lang === 'ru'

@@ -27,51 +27,54 @@ export function defaultGridConfig(labelW: number, labelH: number): GridConfig {
 function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const { width: w, height: h } = data.size;
   const isLarge = h > 100;
+  const isDesign = data.template === 'design';
 
-  const descRatio = isLarge ? 0.25 : 0.24;
+  const descRatio = isDesign ? 0 : (isLarge ? 0.25 : 0.24);
   const tableRatio = isLarge ? 0.15 : 0.18;
   const descH = h * descRatio;
   const tableH = h * tableRatio;
-  const barcodeH = h - descH - tableH;
 
   // ── Border ──
   pdf.setDrawColor(0);
   pdf.setLineWidth(0.3);
   pdf.rect(x, y, w, h);
 
-  // ── Description area ──
-  pdf.setLineWidth(0.3);
-  pdf.line(x, y + descH, x + w, y + descH);
+  // ── Description area (skip for design template) ──
+  if (!isDesign) {
+    pdf.setLineWidth(0.3);
+    pdf.line(x, y + descH, x + w, y + descH);
 
-  // Calculate description font size (matching LabelPreview logic)
-  const descLen = Math.max((data.itemDescription || '—').length, 1);
-  const descAreaW = w * 0.92;
-  const minFont = isLarge ? 3.0 : 1.0;
-  const idealFontH = h * (isLarge ? 0.03 : 0.08);
-  const idealLines = Math.ceil(descH / (idealFontH * 1.3));
-  const neededLines = Math.ceil((descLen * idealFontH * 0.6) / descAreaW);
-  const maxLines = Math.max(2, Math.min(Math.max(idealLines, neededLines), isLarge ? 4 : 6));
-  const maxFontH = descH / (maxLines * 1.3);
-  const charsPerLine = Math.max(1, Math.ceil(descLen / maxLines));
-  const maxFontW = descAreaW / (charsPerLine * 0.6);
-  const titleFontMm = Math.max(minFont, Math.min(maxFontH, maxFontW, h * (isLarge ? 0.04 : 0.1)));
-  const titleFontPt = titleFontMm * MM_TO_PT;
+    // Calculate description font size (matching LabelPreview logic)
+    const descLen = Math.max((data.itemDescription || '—').length, 1);
+    const descAreaW = w * 0.92;
+    const minFont = isLarge ? 3.0 : 1.0;
+    const idealFontH = h * (isLarge ? 0.03 : 0.08);
+    const idealLines = Math.ceil(descH / (idealFontH * 1.3));
+    const neededLines = Math.ceil((descLen * idealFontH * 0.6) / descAreaW);
+    const maxLines = Math.max(2, Math.min(Math.max(idealLines, neededLines), isLarge ? 4 : 6));
+    const maxFontH = descH / (maxLines * 1.3);
+    const charsPerLine = Math.max(1, Math.ceil(descLen / maxLines));
+    const maxFontW = descAreaW / (charsPerLine * 0.6);
+    const titleFontMm = Math.max(minFont, Math.min(maxFontH, maxFontW, h * (isLarge ? 0.04 : 0.1)));
+    const titleFontPt = titleFontMm * MM_TO_PT;
 
-  pdf.setFont('courier', 'bold');
-  pdf.setFontSize(titleFontPt);
+    pdf.setFont('courier', 'bold');
+    pdf.setFontSize(titleFontPt);
 
-  const text = data.itemDescription || '—';
-  const lines = pdf.splitTextToSize(text, descAreaW);
-  const clampedLines = lines.slice(0, maxLines);
-  const lineH = titleFontMm * 1.3;
-  const textBlockH = clampedLines.length * lineH;
-  const textStartY = y + (descH - textBlockH) / 2 + titleFontMm;
+    const text = data.itemDescription || '—';
+    const lines = pdf.splitTextToSize(text, descAreaW);
+    const clampedLines = lines.slice(0, maxLines);
+    const lineH = titleFontMm * 1.3;
+    const textBlockH = clampedLines.length * lineH;
+    const textStartY = y + (descH - textBlockH) / 2 + titleFontMm;
 
-  for (let i = 0; i < clampedLines.length; i++) {
-    pdf.text(clampedLines[i], x + w / 2, textStartY + i * lineH, { align: 'center' });
+    for (let i = 0; i < clampedLines.length; i++) {
+      pdf.text(clampedLines[i], x + w / 2, textStartY + i * lineH, { align: 'center' });
+    }
   }
 
   // ── Barcode (vector) ──
+  const barcodeH = h - descH - tableH;
   const barcodeTop = y + descH;
   const bcPadY = barcodeH * 0.05;
   const bcAreaH = barcodeH - bcPadY * 2;

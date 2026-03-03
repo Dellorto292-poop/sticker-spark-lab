@@ -1,4 +1,4 @@
-export type TemplateType = 'unit' | 'box';
+export type TemplateType = 'unit' | 'box' | 'design';
 export type BarcodeType = 'code128' | 'code39';
 export type QtyType = 'box' | 'pallet' | 'set';
 export type DPI = 203 | 300;
@@ -16,6 +16,11 @@ export const SIZE_PRESETS: LabelSize[] = [
 export const SIZE_PRESETS_BOX: LabelSize[] = [
   { name: '58×40 мм', width: 58, height: 40 },
   { name: 'A4', width: 190, height: 277 },
+];
+
+export const SIZE_PRESETS_DESIGN: LabelSize[] = [
+  { name: '40×20 мм', width: 40, height: 20 },
+  { name: '58×40 мм', width: 58, height: 40 },
 ];
 
 export const DEFAULT_SKU_REGEX = '^[A-Z0-9]+$';

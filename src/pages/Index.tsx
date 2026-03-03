@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import { generateThermalPdf, downloadVectorPdf } from '@/lib/pdf-label';
 import { Button } from '@/components/ui/button';
-import A4PrintDialog from '@/components/A4PrintDialog';
+import { Ruler } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -15,20 +15,20 @@ import type { LabelData, TemplateType } from '@/lib/label-types';
 import { generateId, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import {
   Printer, FileText, FileImage, Package, Box,
-  ArrowLeft, Languages, WifiOff, Grid3X3
+  ArrowLeft, Languages, WifiOff, Grid3X3, PenTool
 } from 'lucide-react';
 
 function createDefaultData(template: TemplateType): LabelData {
   return {
     id: generateId(),
     template,
-    itemDescription: '',
+    itemDescription: template === 'design' ? '' : '',
     sku: '',
     revision: '00',
     boxQty: template === 'box' ? 1 : undefined,
     qtyType: template === 'box' ? 'box' : undefined,
     barcodeType: 'code39',
-    size: { width: 58, height: 40 },
+    size: template === 'design' ? { width: 40, height: 20 } : { width: 58, height: 40 },
     dpi: 203,
     createdAt: Date.now(),
   };
@@ -46,7 +46,7 @@ export default function Index() {
   const previewRef = useRef<HTMLDivElement>(null);
 
   const isFormValid = (() => {
-    if (!data.itemDescription.trim()) return false;
+    if (data.template !== 'design' && !data.itemDescription.trim()) return false;
     if (!data.sku) return false;
     try {
       const re = new RegExp(skuRegex);
@@ -69,7 +69,7 @@ export default function Index() {
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!data.itemDescription.trim()) errs.itemDescription = t(lang, 'required');
+    if (data.template !== 'design' && !data.itemDescription.trim()) errs.itemDescription = t(lang, 'required');
     if (!data.sku) errs.sku = t(lang, 'required');
     else {
       try {
@@ -180,7 +180,7 @@ export default function Index() {
               <span>{lang === 'ru' ? 'Работает офлайн после первой загрузки — можно установить как приложение' : 'Works offline after first load — can be installed as an app'}</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <button
                 onClick={() => selectTemplate('unit')}
                 className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left space-y-3"
@@ -202,6 +202,18 @@ export default function Index() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">{t(lang, 'boxLabel')}</h3>
+                </div>
+              </button>
+
+              <button
+                onClick={() => selectTemplate('design')}
+                className="group p-6 rounded-xl border-2 border-border bg-card hover:border-primary hover:shadow-md transition-all text-left space-y-3"
+              >
+                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <PenTool className="w-5 h-5 text-secondary-foreground group-hover:text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm">{t(lang, 'designLabel')}</h3>
                 </div>
               </button>
             </div>
@@ -229,11 +241,13 @@ export default function Index() {
             <div className="flex items-center gap-2">
               {data.template === 'unit' ? (
                 <Package className="w-4 h-4 text-muted-foreground" />
-              ) : (
+              ) : data.template === 'box' ? (
                 <Box className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <PenTool className="w-4 h-4 text-muted-foreground" />
               )}
               <span className="font-semibold text-sm">
-                {data.template === 'unit' ? t(lang, 'unitLabel') : t(lang, 'boxLabel')}
+                {data.template === 'unit' ? t(lang, 'unitLabel') : data.template === 'box' ? t(lang, 'boxLabel') : t(lang, 'designLabel')}
               </span>
             </div>
           </div>
