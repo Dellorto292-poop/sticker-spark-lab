@@ -101,7 +101,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   // ── Barcode (vector) ──
   const barcodeH = h - descH - tableH;
   const barcodeTop = y + descH;
-  const bcPad = 3; // 3mm from edges
+  const bcPad = 1; // 1mm from edges
   const bcAreaH = barcodeH - bcPad * 2;
   const bcAreaW = w - bcPad * 2;
   const bcX0 = x + bcPad;
