@@ -96,24 +96,25 @@ export default function Index() {
     addToHistory(entry);
     setHistoryRefresh((n) => n + 1);
 
-    if (type === 'thermal') {
-      generateThermalPdf(data);
-      return;
-    }
-
-    if (type === 'a4') {
-      setA4DialogOpen(true);
-      return;
-    }
-
-    if (type === 'pdf') {
-      downloadVectorPdf(data);
-      return;
-    }
-
-    if (!previewRef.current) return;
-
     try {
+      if (type === 'thermal') {
+        generateThermalPdf(data);
+        toast.success(lang === 'ru' ? 'PDF скачан — откройте и печатайте при 100%' : 'PDF downloaded — open and print at 100%');
+        return;
+      }
+
+      if (type === 'a4') {
+        setA4DialogOpen(true);
+        return;
+      }
+
+      if (type === 'pdf') {
+        downloadVectorPdf(data);
+        return;
+      }
+
+      if (!previewRef.current) return;
+
       const dataUrl = await toPng(previewRef.current, {
         pixelRatio: data.dpi === 300 ? 4 : 3,
         backgroundColor: '#ffffff',
@@ -125,6 +126,7 @@ export default function Index() {
       link.click();
     } catch (err) {
       console.error('Export error:', err);
+      toast.error(lang === 'ru' ? 'Ошибка экспорта' : 'Export error');
     }
   };
 

@@ -153,10 +153,7 @@ export function generateThermalPdf(data: LabelData): void {
   });
 
   drawLabel(pdf, 0, 0, data);
-
-  const blob = pdf.output('blob');
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
+  pdf.save(`${data.sku || 'label'}-thermal.pdf`);
 }
 
 /**
@@ -185,9 +182,7 @@ export function generateA4GridPdf(data: LabelData, config: GridConfig): void {
     }
   }
 
-  const blob = pdf.output('blob');
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
+  pdf.save(`${data.sku || 'label'}-a4-grid.pdf`);
 }
 
 /**
