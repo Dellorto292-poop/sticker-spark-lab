@@ -140,42 +140,92 @@ function drawBarcode(pdf: jsPDF, encoded: BarcodeBars, x: number, y: number, are
 }
 
 /**
- * Generate a vector PDF sized exactly to the label dimensions
- * and immediately open the browser print dialog.
- * The window is opened synchronously (preserving user gesture),
- * then the PDF is embedded as an <embed> and print() is called.
+ * Open a popup window with the label as HTML (exact mm dimensions),
+ * set @page size to match, and trigger window.print().
+ * Window is opened synchronously to avoid popup blocker.
  */
 export function generateThermalPdf(data: LabelData): void {
-  // Open window IMMEDIATELY in click context to avoid popup blocker
-  const printWindow = window.open('', '_blank');
+  const { width, height } = data.size;
+  const isLarge = height > 100;
+
+  // Open window IMMEDIATELY to preserve user gesture
+  const printWindow = window.open('', '_blank', `width=${Math.max(width * 4, 400)},height=${Math.max(height * 4, 400)}`);
   if (!printWindow) {
-    // Fallback: just download
     downloadVectorPdf(data);
     return;
   }
 
-  const { width, height } = data.size;
+  // Build barcode as SVG rectangles (synchronous, no canvas needed)
+  const encoded = data.sku ? encodeBarcode(data.sku, data.barcodeType) : null;
+  let barcodeSvg = '';
+  if (encoded && encoded.bars.length > 0) {
+    const barcodeW = width * 0.9;
+    const scale = barcodeW / encoded.totalWidth;
+    const bars = encoded.bars.map(b =>
+      `<rect x="${b.x * scale}" y="0" width="${b.w * scale}" height="100%" fill="#000"/>`
+    ).join('');
+    barcodeSvg = `<svg viewBox="0 0 ${barcodeW} 100" preserveAspectRatio="none" style="width:90%;height:90%">${bars}</svg>`;
+  }
 
-  const pdf = new jsPDF({
-    orientation: width > height ? 'landscape' : 'portrait',
-    unit: 'mm',
-    format: [width, height],
-  });
+  // Layout ratios (match LabelPreview)
+  const descRatio = isLarge ? 0.25 : 0.24;
+  const tableRatio = isLarge ? 0.15 : 0.18;
+  const descH = height * descRatio;
+  const fontSize = isLarge ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
 
-  drawLabel(pdf, 0, 0, data);
+  // Title font sizing
+  const descLen = Math.max((data.itemDescription || '—').length, 1);
+  const descAreaW = width * 0.92;
+  const minFont = isLarge ? 3.0 : 1.0;
+  const idealFontH = height * (isLarge ? 0.03 : 0.08);
+  const idealLines = Math.ceil(descH / (idealFontH * 1.3));
+  const neededLines = Math.ceil((descLen * idealFontH * 0.6) / descAreaW);
+  const maxLines = Math.max(2, Math.min(Math.max(idealLines, neededLines), isLarge ? 4 : 6));
+  const maxFontH = descH / (maxLines * 1.3);
+  const charsPerLine = Math.max(1, Math.ceil(descLen / maxLines));
+  const maxFontW = descAreaW / (charsPerLine * 0.6);
+  const titleFont = Math.max(minFont, Math.min(maxFontH, maxFontW, height * (isLarge ? 0.04 : 0.1)));
 
-  const blobUrl = pdf.output('bloburl') as unknown as string;
+  // Table columns
+  const cols: { label: string; value: string }[] = [
+    { label: 'SKU', value: data.sku || '—' },
+    { label: 'REV.', value: data.revision || '—' },
+  ];
+  if (data.template === 'box') {
+    const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
+    cols.push({ label: qtyLabel, value: String(data.boxQty ?? '—') });
+  }
 
-  printWindow.document.write(`<!DOCTYPE html>
-<html><head><title>Print Label</title>
-<style>body{margin:0;overflow:hidden}embed{width:100%;height:100vh}</style>
-</head><body>
-<embed src="${blobUrl}" type="application/pdf" width="100%" height="100%">
+  const colsHtml = cols.map((col, i) => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;${i < cols.length - 1 ? 'border-right:0.3mm solid #000;' : ''}">
+      <div style="font-size:${fontSize * 0.5}mm;font-weight:bold;opacity:0.7;text-transform:uppercase;white-space:nowrap">${col.label}</div>
+      <div style="font-size:${fontSize * 0.85}mm;font-weight:bold">${col.value}</div>
+    </div>`).join('');
+
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Label</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+@page{size:${width}mm ${height}mm;margin:0}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:${width}mm;height:${height}mm;margin:0;padding:0}
+body{font-family:'JetBrains Mono','Courier New',monospace;color:#000;background:#fff}
+.label{position:relative;width:${width}mm;height:${height}mm;border:0.3mm solid #000;overflow:hidden}
+.desc{position:absolute;top:0;left:0;right:0;height:${descH}mm;padding:2% 4%;font-size:${titleFont}mm;font-weight:bold;line-height:1.2;text-align:center;overflow:hidden;border-bottom:0.3mm solid #000;display:-webkit-box;-webkit-line-clamp:${maxLines};-webkit-box-orient:vertical;overflow-wrap:break-word}
+.barcode{position:absolute;top:${descH}mm;bottom:${height * tableRatio}mm;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:1mm 0}
+.table{position:absolute;bottom:0;left:0;right:0;height:${height * tableRatio}mm;border-top:0.5mm solid #000;display:flex}
+</style></head><body>
+<div class="label">
+  <div class="desc">${esc(data.itemDescription || '—')}</div>
+  <div class="barcode">${barcodeSvg || '<div>[barcode]</div>'}</div>
+  <div class="table">${colsHtml}</div>
+</div>
 <script>
-  // Wait for PDF to render, then trigger print
-  setTimeout(function(){ window.print(); }, 600);
-</script>
-</body></html>`);
+document.fonts.ready.then(function(){setTimeout(function(){window.print();window.close()},300)});
+</script></body></html>`;
+
+  printWindow.document.write(html);
   printWindow.document.close();
 }
 
