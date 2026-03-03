@@ -1,8 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { toPng } from 'html-to-image';
-import { jsPDF } from 'jspdf';
-import { printLabel } from '@/lib/print';
+import { generateThermalPdf, downloadVectorPdf } from '@/lib/pdf-label';
 import { Button } from '@/components/ui/button';
+import A4PrintDialog from '@/components/A4PrintDialog';
 
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -15,7 +15,7 @@ import type { LabelData, TemplateType } from '@/lib/label-types';
 import { generateId, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import {
   Printer, FileText, FileImage, Package, Box,
-  ArrowLeft, Languages, WifiOff
+  ArrowLeft, Languages, WifiOff, Grid3X3
 } from 'lucide-react';
 
 function createDefaultData(template: TemplateType): LabelData {
@@ -42,6 +42,7 @@ export default function Index() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [historyRefresh, setHistoryRefresh] = useState(0);
   const [skuRegex, setSkuRegex] = useState(DEFAULT_SKU_REGEX);
+  const [a4DialogOpen, setA4DialogOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const isFormValid = (() => {
@@ -88,15 +89,25 @@ export default function Index() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleExport = async (type: 'pdf' | 'png' | 'print') => {
+  const handleExport = async (type: 'pdf' | 'png' | 'thermal' | 'a4') => {
     if (!validate()) return;
 
     const entry = { ...data, id: generateId(), createdAt: Date.now() };
     addToHistory(entry);
     setHistoryRefresh((n) => n + 1);
 
-    if (type === 'print') {
-      await printLabel(data);
+    if (type === 'thermal') {
+      generateThermalPdf(data);
+      return;
+    }
+
+    if (type === 'a4') {
+      setA4DialogOpen(true);
+      return;
+    }
+
+    if (type === 'pdf') {
+      downloadVectorPdf(data);
       return;
     }
 
@@ -108,38 +119,10 @@ export default function Index() {
         backgroundColor: '#ffffff',
       });
 
-      if (type === 'png') {
-        const link = document.createElement('a');
-        link.download = `${data.sku || 'label'}.png`;
-        link.href = dataUrl;
-        link.click();
-      } else if (type === 'pdf') {
-        const img = new Image();
-        img.src = dataUrl;
-        await new Promise((r) => (img.onload = r));
-
-        const isA4 = data.size.width >= 190 && data.size.height >= 270;
-        
-        if (isA4) {
-          // A4: page matches label size
-          const pdf = new jsPDF({
-            orientation: data.size.width > data.size.height ? 'landscape' : 'portrait',
-            unit: 'mm',
-            format: [data.size.width, data.size.height],
-          });
-          pdf.addImage(dataUrl, 'PNG', 0, 0, data.size.width, data.size.height);
-          pdf.save(`${data.sku || 'label'}.pdf`);
-        } else {
-          // Small labels: center on A4 page
-          const pageW = 210;
-          const pageH = 297;
-          const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-          const x = 10;
-          const y = 10;
-          pdf.addImage(dataUrl, 'PNG', x, y, data.size.width, data.size.height);
-          pdf.save(`${data.sku || 'label'}.pdf`);
-        }
-      }
+      const link = document.createElement('a');
+      link.download = `${data.sku || 'label'}.png`;
+      link.href = dataUrl;
+      link.click();
     } catch (err) {
       console.error('Export error:', err);
     }
@@ -293,11 +276,17 @@ export default function Index() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <Button onClick={() => handleExport('print')} variant="outline" className="h-11 flex-col gap-0.5 py-1" disabled={!isFormValid}>
-                <span className="flex items-center gap-2"><Printer className="w-4 h-4" />{t(lang, 'print')}</span>
-                <span className="text-[10px] text-muted-foreground font-normal">Zebra Printer Only</span>
+            <div className="grid grid-cols-2 gap-3">
+              <Button onClick={() => handleExport('thermal')} variant="outline" className="h-12 flex-col gap-0.5 py-1" disabled={!isFormValid}>
+                <span className="flex items-center gap-2"><Printer className="w-4 h-4" />{t(lang, 'printThermal')}</span>
+                <span className="text-[10px] text-muted-foreground font-normal">1:1 · Zebra / TSC</span>
               </Button>
+              <Button onClick={() => handleExport('a4')} variant="outline" className="h-12 flex-col gap-0.5 py-1" disabled={!isFormValid}>
+                <span className="flex items-center gap-2"><Grid3X3 className="w-4 h-4" />{t(lang, 'printA4')}</span>
+                <span className="text-[10px] text-muted-foreground font-normal">{lang === 'ru' ? 'Сетка на листе' : 'Grid on sheet'}</span>
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <Button onClick={() => handleExport('pdf')} variant="outline" className="h-11" disabled={!isFormValid}>
                 <FileText className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPdf')}
@@ -307,6 +296,13 @@ export default function Index() {
                 {t(lang, 'downloadPng')}
               </Button>
             </div>
+
+            <A4PrintDialog
+              open={a4DialogOpen}
+              onOpenChange={setA4DialogOpen}
+              data={data}
+              lang={lang}
+            />
           </div>
         </div>
       </div>
