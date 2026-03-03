@@ -289,19 +289,19 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Button onClick={() => handleExport('pdf')} variant="outline" className="h-11" disabled={!isFormValid}>
+              <Button onClick={() => handleExport('pdf')} variant="outline" className="h-11 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors" disabled={!isFormValid}>
                 <FileText className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPdf')}
               </Button>
-              <Button onClick={() => handleExport('png')} variant="outline" className="h-11" disabled={!isFormValid}>
+              <Button onClick={() => handleExport('png')} variant="outline" className="h-11 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors" disabled={!isFormValid}>
                 <FileImage className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPng')}
               </Button>
             </div>
 
-            <Button onClick={() => handleExport('a4')} variant="secondary" className="w-full h-11" disabled={!isFormValid}>
+            <Button onClick={() => handleExport('a4')} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors" disabled={!isFormValid}>
               <Grid3X3 className="w-4 h-4 mr-2" />
-              {t(lang, 'printA4')}
+              {lang === 'ru' ? 'Печать множества стикеров на листе А4' : 'Print multiple stickers on A4 sheet'}
             </Button>
 
             <A4PrintDialog
