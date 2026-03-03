@@ -195,18 +195,29 @@ export async function generateThermalPdf(data: LabelData): Promise<void> {
 
   const blobUrl = pdf.output('bloburl') as unknown as string;
 
-  // Write an HTML page that embeds the PDF and auto-prints
-  printWindow.document.write(`<!DOCTYPE html><html><head><title>Label</title>
-<style>*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}
-iframe{width:100%;height:100%;border:none}</style></head><body>
-<iframe id="pf" src="${blobUrl}"></iframe>
-<script>
-var f=document.getElementById('pf');
-f.onload=function(){
-  try{f.contentWindow.print()}catch(e){window.print()}
-};
-</script></body></html>`);
-  printWindow.document.close();
+  // Validate blob URL to prevent injection
+  if (typeof blobUrl !== 'string' || !blobUrl.startsWith('blob:')) {
+    printWindow.close();
+    throw new Error('Invalid PDF blob URL');
+  }
+
+  // Use DOM APIs instead of document.write to avoid XSS risk
+  const doc = printWindow.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><title>Label</title></head><body></body></html>');
+  doc.close();
+
+  const style = doc.createElement('style');
+  style.textContent = '*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}iframe{width:100%;height:100%;border:none}';
+  doc.head.appendChild(style);
+
+  const iframe = doc.createElement('iframe');
+  iframe.setAttribute('id', 'pf');
+  iframe.src = blobUrl;
+  iframe.onload = () => {
+    try { iframe.contentWindow?.print(); } catch { printWindow.print(); }
+  };
+  doc.body.appendChild(iframe);
 }
 
 /**
