@@ -98,7 +98,7 @@ export default function Index() {
 
     try {
       if (type === 'thermal') {
-        generateThermalPdf(data);
+        await generateThermalPdf(data);
         toast.success(lang === 'ru' ? 'PDF скачан — откройте и печатайте при 100%' : 'PDF downloaded — open and print at 100%');
         return;
       }
@@ -109,7 +109,7 @@ export default function Index() {
       }
 
       if (type === 'pdf') {
-        downloadVectorPdf(data);
+        await downloadVectorPdf(data);
         return;
       }
 

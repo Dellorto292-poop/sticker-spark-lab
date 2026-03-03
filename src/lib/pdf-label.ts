@@ -4,6 +4,27 @@ import { encodeBarcode, type BarcodeBars } from './barcode-encoder';
 
 const MM_TO_PT = 72 / 25.4; // ≈ 2.8346
 
+// ── Font loading (Cyrillic support) ──
+let fontBase64Cache: string | null = null;
+
+async function loadCyrillicFont(): Promise<string> {
+  if (fontBase64Cache) return fontBase64Cache;
+  const res = await fetch('/fonts/JetBrainsMono-Bold.ttf');
+  const buf = await res.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  fontBase64Cache = btoa(binary);
+  return fontBase64Cache;
+}
+
+function registerFont(pdf: jsPDF, fontBase64: string): void {
+  pdf.addFileToVFS('JetBrainsMono-Bold.ttf', fontBase64);
+  pdf.addFont('JetBrainsMono-Bold.ttf', 'JetBrainsMono', 'bold');
+}
+
 export interface GridConfig {
   cols: number;
   rows: number;
@@ -59,7 +80,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     const titleFontMm = Math.max(minFont, Math.min(maxFontH, maxFontW, h * (isLarge ? 0.04 : 0.1)));
     const titleFontPt = titleFontMm * MM_TO_PT;
 
-    pdf.setFont('courier', 'bold');
+    pdf.setFont('JetBrainsMono', 'bold');
     pdf.setFontSize(titleFontPt);
 
     const text = data.itemDescription || '—';
@@ -112,7 +133,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
     // Label
     pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
-    pdf.setFont('courier', 'bold');
+    pdf.setFont('JetBrainsMono', 'bold');
     pdf.setTextColor(100);
     pdf.text(cols[i].label, cx, cy - tableH * 0.12, { align: 'center' });
 
@@ -150,13 +171,13 @@ function drawBarcode(pdf: jsPDF, encoded: BarcodeBars, x: number, y: number, are
  * set @page size to match, and trigger window.print().
  * Window is opened synchronously to avoid popup blocker.
  */
-export function generateThermalPdf(data: LabelData): void {
+export async function generateThermalPdf(data: LabelData): Promise<void> {
   const { width, height } = data.size;
 
   // Open window IMMEDIATELY (synchronous) to avoid popup blocker
   const printWindow = window.open('', '_blank', `width=${Math.max(width * 4, 400)},height=${Math.max(height * 4, 400)}`);
   if (!printWindow) {
-    downloadVectorPdf(data);
+    await downloadVectorPdf(data);
     return;
   }
 
@@ -166,6 +187,9 @@ export function generateThermalPdf(data: LabelData): void {
     unit: 'mm',
     format: [width, height],
   });
+
+  const fontBase64 = await loadCyrillicFont();
+  registerFont(pdf, fontBase64);
 
   drawLabel(pdf, 0, 0, data);
 
@@ -189,7 +213,7 @@ f.onload=function(){
  * Generate a vector PDF on A4 with a grid of labels.
  * Opens in a new tab for printing.
  */
-export function generateA4GridPdf(data: LabelData, config: GridConfig): void {
+export async function generateA4GridPdf(data: LabelData, config: GridConfig): Promise<void> {
   const { cols, rows, hGapMm, vGapMm, marginMm } = config;
   const { width: lw, height: lh } = data.size;
 
@@ -199,12 +223,14 @@ export function generateA4GridPdf(data: LabelData, config: GridConfig): void {
     format: 'a4',
   });
 
+  const fontBase64 = await loadCyrillicFont();
+  registerFont(pdf, fontBase64);
+
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const lx = marginMm + col * (lw + hGapMm);
       const ly = marginMm + row * (lh + vGapMm);
 
-      // Check if label fits on page
       if (lx + lw > 210 - marginMm + 0.5 || ly + lh > 297 - marginMm + 0.5) continue;
 
       drawLabel(pdf, lx, ly, data);
@@ -217,7 +243,7 @@ export function generateA4GridPdf(data: LabelData, config: GridConfig): void {
 /**
  * Download a vector PDF (single label on label-sized page).
  */
-export function downloadVectorPdf(data: LabelData): void {
+export async function downloadVectorPdf(data: LabelData): Promise<void> {
   const { width, height } = data.size;
 
   const pdf = new jsPDF({
@@ -225,6 +251,9 @@ export function downloadVectorPdf(data: LabelData): void {
     unit: 'mm',
     format: [width, height],
   });
+
+  const fontBase64 = await loadCyrillicFont();
+  registerFont(pdf, fontBase64);
 
   drawLabel(pdf, 0, 0, data);
   pdf.save(`${data.sku || 'label'}.pdf`);
