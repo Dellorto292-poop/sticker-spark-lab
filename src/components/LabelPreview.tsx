@@ -29,11 +29,13 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
   const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
 
+  const isDesign = data.template === 'design';
+
   // Adaptive ratios: large formats need less relative space for desc/table
-  const descAreaRatio = isLargeFormat ? 0.25 : 0.24;
+  const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   const tableAreaRatio = isLargeFormat ? 0.15 : 0.18;
 
-  // Dynamic font sizing: fits any label size and text length
+  // Dynamic font sizing (only used when description is shown)
   const descLen = Math.max(data.itemDescription.length, 1);
   const descAreaH = height * descAreaRatio;
   const descAreaW = width * 0.92;
@@ -66,22 +68,24 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             '--print-scale-y': `${(height * 3.7795) / scaledH}`,
           } as React.CSSProperties}
         >
-          {/* Item Description (fixed area) */}
-          <div
-            className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center border-b border-black"
-            style={{
-              height: `${height * descAreaRatio * scale}px`,
-              fontSize: `${titleFontSize * scale}px`,
-              lineHeight: 1.2,
-              display: '-webkit-box',
-              WebkitLineClamp: descMaxLines,
-              WebkitBoxOrient: 'vertical',
-              overflowWrap: 'break-word',
-              wordBreak: 'normal',
-            }}
-          >
-            {data.itemDescription || '—'}
-          </div>
+          {/* Item Description (fixed area) — hidden for design template */}
+          {!isDesign && (
+            <div
+              className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center border-b border-black"
+              style={{
+                height: `${height * descAreaRatio * scale}px`,
+                fontSize: `${titleFontSize * scale}px`,
+                lineHeight: 1.2,
+                display: '-webkit-box',
+                WebkitLineClamp: descMaxLines,
+                WebkitBoxOrient: 'vertical',
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
+              }}
+            >
+              {data.itemDescription || '—'}
+            </div>
+          )}
 
           {/* Barcode (fixed area) */}
           <div
