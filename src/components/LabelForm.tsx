@@ -173,7 +173,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onChange({ size: { ...data.size, width: v ? parseInt(v) : 0 } });
                 }}
                 onBlur={() => {
-                  if (!data.size.width || data.size.width < 20) onChange({ size: { ...data.size, width: 20 } });
+                  if (!data.size.width || data.size.width < 40) onChange({ size: { ...data.size, width: 40 } });
                 }}
                 className={`text-sm font-mono ${data.size.width > 190 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               />
@@ -194,7 +194,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onChange({ size: { ...data.size, height: v ? parseInt(v) : 0 } });
                 }}
                 onBlur={() => {
-                  if (!data.size.height || data.size.height < 10) onChange({ size: { ...data.size, height: 10 } });
+                  if (!data.size.height || data.size.height < 20) onChange({ size: { ...data.size, height: 20 } });
                 }}
                 className={`text-sm font-mono ${data.size.height > 277 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               />
