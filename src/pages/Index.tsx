@@ -54,6 +54,7 @@ export default function Index() {
     } catch { /* skip */ }
     if (!data.revision || !/^\d{2}$/.test(data.revision)) return false;
     if (data.template === 'box' && (!data.boxQty || data.boxQty < 1 || !Number.isInteger(data.boxQty))) return false;
+    if (data.size.width > 190 || data.size.height > 277) return false;
     return true;
   })();
 
