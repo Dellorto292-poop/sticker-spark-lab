@@ -129,18 +129,18 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const colW = w / cols.length;
   for (let i = 0; i < cols.length; i++) {
     const cx = x + i * colW + colW / 2;
-    const cy = tableTop + tableH / 2;
 
     // Label
+    pdf.setFont('courier', 'bold');
     pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
-    pdf.setFont('JetBrainsMono', 'bold');
     pdf.setTextColor(100);
-    pdf.text(cols[i].label, cx, cy - tableH * 0.12, { align: 'center' });
+    pdf.text(cols[i].label, cx, tableTop + tableH * 0.3, { align: 'center' });
 
     // Value
+    pdf.setFont('courier', 'bold');
     pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
     pdf.setTextColor(0);
-    pdf.text(cols[i].value, cx, cy + tableH * 0.18, { align: 'center' });
+    pdf.text(cols[i].value, cx, tableTop + tableH * 0.76, { align: 'center' });
 
     // Column separator
     if (i < cols.length - 1) {
