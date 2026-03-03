@@ -141,12 +141,12 @@ export async function printLabel(data: LabelData): Promise<void> {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1mm 0;
+      padding: 3mm;
     }
     
     .barcode img {
-      width: 90%;
-      height: 90%;
+      width: 100%;
+      height: 100%;
       object-fit: ${isLargeFormat ? 'contain' : 'fill'};
     }
     

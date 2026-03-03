@@ -101,14 +101,14 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   // ── Barcode (vector) ──
   const barcodeH = h - descH - tableH;
   const barcodeTop = y + descH;
-  const bcPadY = barcodeH * 0.04;
-  const bcAreaH = barcodeH - bcPadY * 2;
-  const bcAreaW = w * 0.94;
-  const bcX0 = x + (w - bcAreaW) / 2;
+  const bcPad = 3; // 3mm from edges
+  const bcAreaH = barcodeH - bcPad * 2;
+  const bcAreaW = w - bcPad * 2;
+  const bcX0 = x + bcPad;
 
   if (data.sku) {
     const encoded = encodeBarcode(data.sku, data.barcodeType);
-    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadY, bcAreaW, bcAreaH);
+    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPad, bcAreaW, bcAreaH);
   }
 
   // ── Table area ──

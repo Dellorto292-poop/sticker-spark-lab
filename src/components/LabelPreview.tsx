@@ -100,14 +100,14 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             style={{
               top: `${height * descAreaRatio * scale}px`,
               bottom: `${height * tableAreaRatio * scale}px`,
-              padding: `${2.5 * scale}px 0`,
+              padding: `${3 * scale}px`,
             }}
           >
             {barcodeUrl ? (
               <img
                 src={barcodeUrl}
                 alt="barcode"
-                style={{ width: '94%', height: '90%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
+                style={{ width: `calc(100% - ${6 * scale}px)`, height: `calc(100% - ${6 * scale}px)`, objectFit: isLargeFormat ? 'contain' : 'fill' }}
               />
             ) : (
             <div
