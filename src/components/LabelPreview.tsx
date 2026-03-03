@@ -103,7 +103,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               <img
                 src={barcodeUrl}
                 alt="barcode"
-                style={{ width: '90%', height: '90%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
+                style={{ width: '94%', height: '90%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
               />
             ) : (
             <div
