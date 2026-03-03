@@ -96,7 +96,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             style={{
               top: `${height * descAreaRatio * scale}px`,
               bottom: `${height * tableAreaRatio * scale}px`,
-              padding: `${4 * scale}px 0`,
+              padding: `${1 * scale}px 0`,
             }}
           >
             {barcodeUrl ? (
