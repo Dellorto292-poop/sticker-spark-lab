@@ -30,10 +30,11 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.12, 2.5);
 
   const isDesign = data.template === 'design';
+  const isCompactFormat = height <= 24;
 
   // Adaptive ratios: large formats need less relative space for desc/table
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
-  const tableAreaRatio = isLargeFormat ? 0.15 : 0.18;
+  const tableAreaRatio = isLargeFormat ? 0.15 : (isCompactFormat ? 0.24 : 0.18);
 
   // Dynamic font sizing (only used when description is shown)
   const descLen = Math.max(data.itemDescription.length, 1);
@@ -50,6 +51,8 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const charsPerLine = Math.max(1, Math.ceil(descLen / descMaxLines));
   const maxFontByWidth = descAreaW / (charsPerLine * 0.6);
   const titleFontSize = Math.max(minFontSize, Math.min(maxFontByHeight, maxFontByWidth, height * (isLargeFormat ? 0.04 : 0.1)));
+  const tableLabelScale = isCompactFormat ? 0.4 : 0.5;
+  const tableValueScale = isCompactFormat ? 0.7 : 0.85;
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -118,26 +121,26 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             style={{ height: `${height * tableAreaRatio * scale}px` }}
           >
             {/* SKU column */}
-            <div className="flex-1 border-r border-black flex flex-col items-center justify-center">
-              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * 0.5}px`, opacity: 0.7 }}>SKU</div>
-              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
+            <div className="flex-1 border-r border-black flex flex-col items-center justify-center leading-none">
+              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>SKU</div>
+              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
                 {data.sku || '—'}
               </div>
             </div>
             {/* Rev column */}
-            <div className={`flex-1 ${data.template === 'box' ? 'border-r border-black' : ''} flex flex-col items-center justify-center`}>
-              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * 0.5}px`, opacity: 0.7 }}>Rev.</div>
-              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
+            <div className={`flex-1 ${data.template === 'box' ? 'border-r border-black' : ''} flex flex-col items-center justify-center leading-none`}>
+              <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>Rev.</div>
+              <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
                 {data.revision || '—'}
               </div>
             </div>
             {/* Box Qty column (only for box template) */}
             {data.template === 'box' && (
-              <div className="flex-1 flex flex-col items-center justify-center">
-                <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * 0.5}px`, opacity: 0.7 }}>
+              <div className="flex-1 flex flex-col items-center justify-center leading-none">
+                <div className="uppercase whitespace-nowrap font-bold" style={{ fontSize: `${fontSize * scale * tableLabelScale}px`, opacity: 0.7, lineHeight: 1 }}>
                   {data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty'}
                 </div>
-                <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * 0.85}px` }}>
+                <div className="font-bold font-mono" style={{ fontSize: `${fontSize * scale * tableValueScale}px`, lineHeight: 1 }}>
                   {data.boxQty ?? '—'}
                 </div>
               </div>

@@ -28,9 +28,10 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const { width: w, height: h } = data.size;
   const isLarge = h > 100;
   const isDesign = data.template === 'design';
+  const isCompactFormat = h <= 24;
 
   const descRatio = isDesign ? 0 : (isLarge ? 0.25 : 0.24);
-  const tableRatio = isLarge ? 0.15 : 0.18;
+  const tableRatio = isLarge ? 0.15 : (isCompactFormat ? 0.24 : 0.18);
   const descH = h * descRatio;
   const tableH = h * tableRatio;
 
@@ -91,7 +92,9 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   pdf.setLineWidth(0.5);
   pdf.line(x, tableTop, x + w, tableTop);
 
-  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.12, 2.5);
+  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
+  const labelFontScale = isCompactFormat ? 0.4 : 0.5;
+  const valueFontScale = isCompactFormat ? 0.7 : 0.85;
 
   const cols: { label: string; value: string }[] = [
     { label: 'SKU', value: data.sku || '—' },
@@ -108,13 +111,13 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     const cy = tableTop + tableH / 2;
 
     // Label
-    pdf.setFontSize(baseFontMm * 0.5 * MM_TO_PT);
+    pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
     pdf.setFont('courier', 'bold');
     pdf.setTextColor(100);
     pdf.text(cols[i].label, cx, cy - tableH * 0.12, { align: 'center' });
 
     // Value
-    pdf.setFontSize(baseFontMm * 0.85 * MM_TO_PT);
+    pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
     pdf.setTextColor(0);
     pdf.text(cols[i].value, cx, cy + tableH * 0.18, { align: 'center' });
 
