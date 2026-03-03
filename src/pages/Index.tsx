@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import LabelForm from '@/components/LabelForm';
 import LabelPreview from '@/components/LabelPreview';
+import A4PrintDialog from '@/components/A4PrintDialog';
 import HistoryPanel from '@/components/HistoryPanel';
 import { t, type Lang } from '@/lib/i18n';
 import { addToHistory } from '@/lib/history';
@@ -292,11 +293,23 @@ export default function Index() {
                 <FileText className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPdf')}
               </Button>
-              <Button onClick={() => handleExport('png')} className="h-11" disabled={!isFormValid}>
+              <Button onClick={() => handleExport('png')} variant="outline" className="h-11" disabled={!isFormValid}>
                 <FileImage className="w-4 h-4 mr-2" />
                 {t(lang, 'downloadPng')}
               </Button>
             </div>
+
+            <Button onClick={() => handleExport('a4')} variant="secondary" className="w-full h-11" disabled={!isFormValid}>
+              <Grid3X3 className="w-4 h-4 mr-2" />
+              {t(lang, 'printA4')}
+            </Button>
+
+            <A4PrintDialog
+              open={a4DialogOpen}
+              onOpenChange={setA4DialogOpen}
+              data={data}
+              lang={lang}
+            />
           </div>
         </div>
       </div>
