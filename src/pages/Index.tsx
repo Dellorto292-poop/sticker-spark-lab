@@ -14,7 +14,7 @@ import type { LabelData, TemplateType } from '@/lib/label-types';
 import { generateId, DEFAULT_SKU_REGEX } from '@/lib/label-types';
 import {
   Printer, FileText, FileImage, Package, Box,
-  ArrowLeft, Languages, WifiOff, Grid3X3, PenTool
+  ArrowLeft, Languages, Grid3X3, PenTool
 } from 'lucide-react';
 
 function createDefaultData(template: TemplateType): LabelData {
@@ -161,11 +161,6 @@ export default function Index() {
         <div className="flex-1 flex items-center justify-center px-6">
           <div className="max-w-lg w-full space-y-6">
             <h2 className="text-xl font-semibold text-center">{t(lang, 'selectTemplate')}</h2>
-
-            <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-primary/5 border border-primary/15 text-sm text-muted-foreground">
-              <WifiOff className="w-4 h-4 text-primary shrink-0" />
-              <span>{lang === 'ru' ? 'Работает офлайн после первой загрузки — можно установить как приложение' : 'Works offline after first load — can be installed as an app'}</span>
-            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <button
