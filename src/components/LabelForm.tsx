@@ -64,10 +64,10 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
       </div>
 
       {/* Revision + Qty + Size row */}
-      <div className="flex gap-4 flex-wrap">
+      <div className="grid gap-4" style={{ gridTemplateColumns: data.template === 'box' ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)' }}>
         {/* Revision */}
-        <div className="space-y-1.5 shrink-0">
-          <Label htmlFor="revision" className="text-sm font-medium">
+        <div className="space-y-1.5">
+          <Label htmlFor="revision" className="text-sm font-medium truncate block">
             {t(lang, 'revision')}
           </Label>
           <Input
@@ -78,7 +78,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
               onChange({ revision: v });
             }}
             placeholder="00"
-            className={`font-mono text-sm font-bold w-24 ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            className={`font-mono text-sm font-bold ${!data.revision || data.revision.length < 2 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
             maxLength={2}
           />
           {data.revision.length > 0 && data.revision.length < 2 && (
@@ -91,7 +91,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         {data.template === 'box' && (
           <>
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium">
+              <Label className="text-sm font-medium truncate block">
                 {t(lang, 'qtyTypeHint')}
               </Label>
               <Select
@@ -108,8 +108,8 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5 shrink-0">
-              <Label htmlFor="boxQty" className="text-sm font-medium">
+            <div className="space-y-1.5">
+              <Label htmlFor="boxQty" className="text-sm font-medium truncate block">
                 {t(lang, 'qtyType')}
               </Label>
               <Input
@@ -120,16 +120,16 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onChange({ boxQty: v ? parseInt(v) : undefined });
                 }}
                 placeholder={t(lang, 'boxQtyHint')}
-                className={`font-mono text-sm font-bold w-20 ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                className={`font-mono text-sm font-bold ${!data.boxQty || data.boxQty < 1 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               />
               {errors.boxQty && <p className="text-xs text-destructive">{errors.boxQty}</p>}
             </div>
           </>
         )}
 
-        {/* Label size — all templates */}
-        <div className="space-y-1.5 flex-1 min-w-[140px]">
-          <Label className="text-sm font-medium">{t(lang, 'labelSize')}</Label>
+        {/* Label size */}
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium truncate block">{t(lang, 'labelSize')}</Label>
           <Select
             value={sizePresetKey}
             onValueChange={(v) => {
