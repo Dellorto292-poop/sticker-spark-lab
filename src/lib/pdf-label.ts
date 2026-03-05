@@ -41,9 +41,6 @@ export function defaultGridConfig(labelW: number, labelH: number): GridConfig {
   return { cols, rows, hGapMm: hGap, vGapMm: vGap, marginMm: margin };
 }
 
-/**
- * Draw a single label at (x, y). Layout: Description → Barcode → Info row. No borders.
- */
 function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const { width: w, height: h } = data.size;
   const isLarge = h > 100;
@@ -53,7 +50,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
   const descRatio = isDesign ? 0 : (isLarge ? 0.25 : 0.24);
   const infoRatio = isBox
-    ? (isLarge ? 0.18 : (isCompactFormat ? 0.28 : 0.22))
+    ? (isLarge ? 0.30 : (isCompactFormat ? 0.28 : 0.30))
     : (isLarge ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
   const descH = h * descRatio;
   const infoH = h * infoRatio;
@@ -103,7 +100,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
   }
 
-  // ── Info row (bottom, labels above values) ──
+  // ── Info row (bottom) ──
   const infoTop = y + h - infoH;
   const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
   const labelFontScale = isCompactFormat ? 0.4 : 0.5;
@@ -111,24 +108,40 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
   if (isBox) {
     const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
-    const cols: { label: string; value: string }[] = [
-      { label: 'SKU', value: data.sku || '—' },
-      { label: 'REV.', value: data.revision || '—' },
-      { label: qtyLabel, value: String(data.boxQty ?? '—') },
-    ];
+    const colW = w / 3;
 
-    const colW = w / cols.length;
-    for (let i = 0; i < cols.length; i++) {
-      const cx = x + i * colW + colW / 2;
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
-      pdf.setTextColor(0);
-      pdf.text(cols[i].label, cx, infoTop + infoH * 0.35, { align: 'center' });
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
-      pdf.setTextColor(0);
-      pdf.text(cols[i].value, cx, infoTop + infoH * 0.78, { align: 'center' });
+    // SKU column
+    const skuCx = x + colW * 0.5;
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
+    pdf.setTextColor(0);
+    pdf.text('SKU', skuCx, infoTop + infoH * 0.2, { align: 'center' });
+    pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
+    pdf.text(data.sku || '—', skuCx, infoTop + infoH * 0.45, { align: 'center' });
+
+    // REV column — text + barcode
+    const revCx = x + colW * 1.5;
+    pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
+    pdf.text('REV.', revCx, infoTop + infoH * 0.2, { align: 'center' });
+    pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
+    pdf.text(data.revision || '—', revCx, infoTop + infoH * 0.45, { align: 'center' });
+
+    // Revision barcode under REV value
+    if (data.revision && data.revision.length === 2) {
+      const revBcW = colW * 0.7;
+      const revBcH = infoH * 0.35;
+      const revBcX = revCx - revBcW / 2;
+      const revBcY = infoTop + infoH * 0.55;
+      const revEncoded = encodeBarcode(data.revision, data.barcodeType);
+      drawBarcode(pdf, revEncoded, revBcX, revBcY, revBcW, revBcH);
     }
+
+    // QTY column
+    const qtyCx = x + colW * 2.5;
+    pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
+    pdf.text(qtyLabel, qtyCx, infoTop + infoH * 0.2, { align: 'center' });
+    pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
+    pdf.text(String(data.boxQty ?? '—'), qtyCx, infoTop + infoH * 0.45, { align: 'center' });
   } else {
     const cols: { label: string; value: string }[] = [
       { label: 'SKU', value: data.sku || '—' },
