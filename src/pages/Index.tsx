@@ -26,7 +26,7 @@ function createDefaultData(template: TemplateType): LabelData {
     revision: '00',
     boxQty: template === 'box' ? 1 : undefined,
     qtyType: template === 'box' ? 'box' : undefined,
-    barcodeType: 'code39',
+    barcodeType: 'code128',
     size: template === 'design' ? { width: 40, height: 20 } : { width: 58, height: 40 },
     dpi: 203,
     createdAt: Date.now(),

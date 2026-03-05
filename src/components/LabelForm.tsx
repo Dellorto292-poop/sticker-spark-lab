@@ -173,7 +173,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onChange({ size: { ...data.size, width: v ? parseInt(v) : 0 } });
                 }}
                 onBlur={() => {
-                  if (!data.size.width || data.size.width < 40) onChange({ size: { ...data.size, width: 40 } });
+                  if (!data.size.width || data.size.width < 1) onChange({ size: { ...data.size, width: 1 } });
                 }}
                 className={`text-sm font-mono ${data.size.width > 190 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               />
@@ -194,7 +194,7 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
                   onChange({ size: { ...data.size, height: v ? parseInt(v) : 0 } });
                 }}
                 onBlur={() => {
-                  if (!data.size.height || data.size.height < 20) onChange({ size: { ...data.size, height: 20 } });
+                  if (!data.size.height || data.size.height < 1) onChange({ size: { ...data.size, height: 1 } });
                 }}
                 className={`text-sm font-mono ${data.size.height > 277 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
               />
@@ -208,26 +208,6 @@ export default function LabelForm({ data, onChange, lang, errors }: Props) {
         </div>
       )}
 
-      {/* Barcode type (design template) */}
-      {data.template === 'design' && (
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium">
-            {lang === 'ru' ? 'Кодировка' : 'Barcode type'}
-          </Label>
-          <Select
-            value={data.barcodeType}
-            onValueChange={(v) => onChange({ barcodeType: v as BarcodeType })}
-          >
-            <SelectTrigger className="w-full font-bold">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="code39">Code 39</SelectItem>
-              <SelectItem value="code128">Code 128</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
 
     </div>
   );

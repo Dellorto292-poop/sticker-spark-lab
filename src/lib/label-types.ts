@@ -1,5 +1,5 @@
 export type TemplateType = 'unit' | 'box' | 'design';
-export type BarcodeType = 'code128' | 'code39';
+export type BarcodeType = 'code128';
 export type QtyType = 'box' | 'pallet' | 'set';
 export type DPI = 203 | 300;
 
