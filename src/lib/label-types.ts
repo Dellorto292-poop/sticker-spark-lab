@@ -14,7 +14,9 @@ export const SIZE_PRESETS: LabelSize[] = [
 ];
 
 export const SIZE_PRESETS_BOX: LabelSize[] = [
-  { name: '58×40 мм', width: 58, height: 40 },
+  { name: '100×50 мм', width: 100, height: 50 },
+  { name: '120×75 мм', width: 120, height: 75 },
+  { name: '100×150 мм', width: 100, height: 150 },
   { name: 'A4', width: 190, height: 277 },
 ];
 
