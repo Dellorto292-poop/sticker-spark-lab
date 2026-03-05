@@ -88,22 +88,8 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     }
   }
 
-  // ── Barcode (middle, 80% width) ──
-  const barcodeAreaH = h - descH - infoH;
-  const barcodeTop = y + descH;
-  const bcPadV = 2;
-  const bcPadH = w * 0.1;
-  const bcAreaH = barcodeAreaH - bcPadV * 2;
-  const bcAreaW = w - bcPadH * 2;
-  const bcX0 = x + bcPadH;
-
-  if (data.sku) {
-    const encoded = encodeBarcode(data.sku, data.barcodeType);
-    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
-  }
-
-  // ── Info row (bottom) ──
-  const infoTop = y + h - infoH;
+  // ── Info row (after description, above barcode) ──
+  const infoTop = y + descH;
   const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
   const labelFontScale = isCompactFormat ? 0.4 : 0.5;
   const valueFontScale = isCompactFormat ? 0.7 : 0.85;
@@ -155,6 +141,20 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     pdf.setFontSize(valueFontPt);
     pdf.setTextColor(0);
     pdf.text(data.revision || '—', revLabelX + revLabelW, midY);
+  }
+
+  // ── Barcode (bottom, 80% width) ──
+  const barcodeAreaH = h - descH - infoH;
+  const barcodeTop = y + descH + infoH;
+  const bcPadV = 2;
+  const bcPadH = w * 0.1;
+  const bcAreaH = barcodeAreaH - bcPadV * 2;
+  const bcAreaW = w - bcPadH * 2;
+  const bcX0 = x + bcPadH;
+
+  if (data.sku) {
+    const encoded = encodeBarcode(data.sku, data.barcodeType);
+    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
   }
 
   pdf.setTextColor(0);

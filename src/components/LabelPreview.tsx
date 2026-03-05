@@ -92,35 +92,13 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             </div>
           )}
 
-          {/* Barcode (middle) */}
+          {/* Info row (after description, above barcode) — SKU / REV / QTY */}
           <div
-            className="absolute left-0 right-0 flex flex-col items-center justify-center"
+            className="absolute left-0 right-0 flex"
             style={{
               top: `${descAreaH * scale}px`,
-              bottom: `${height * infoAreaRatio * scale}px`,
-              padding: `${2 * scale}px ${1 * scale}px`,
+              height: `${height * infoAreaRatio * scale}px`,
             }}
-          >
-            {barcodeUrl ? (
-              <img
-                src={barcodeUrl}
-                alt="barcode"
-                style={{ width: '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
-              />
-            ) : (
-              <div
-                className="flex items-center justify-center text-muted-foreground border border-dashed border-border"
-                style={{ width: '80%', height: '80%', fontSize: `${baseFontSize * scale * 0.7}px` }}
-              >
-                [barcode]
-              </div>
-            )}
-          </div>
-
-          {/* Info row (bottom) — SKU / REV / QTY */}
-          <div
-            className="absolute bottom-0 left-0 right-0 flex"
-            style={{ height: `${height * infoAreaRatio * scale}px` }}
           >
             {isBoxTemplate ? (
               <>
@@ -162,6 +140,31 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               </>
             )}
           </div>
+
+          {/* Barcode (bottom) */}
+          <div
+            className="absolute left-0 right-0 bottom-0 flex flex-col items-center justify-center"
+            style={{
+              top: `${(descAreaH + height * infoAreaRatio) * scale}px`,
+              padding: `${2 * scale}px ${1 * scale}px`,
+            }}
+          >
+            {barcodeUrl ? (
+              <img
+                src={barcodeUrl}
+                alt="barcode"
+                style={{ width: '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center text-muted-foreground border border-dashed border-border"
+                style={{ width: '80%', height: '80%', fontSize: `${baseFontSize * scale * 0.7}px` }}
+              >
+                [barcode]
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
 
