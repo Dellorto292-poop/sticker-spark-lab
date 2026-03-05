@@ -20,7 +20,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
   // Generate revision barcode for box template
   useEffect(() => {
-    if (data.template === 'box' && data.revision && data.revision.length === 2) {
+    if (data.template === 'box' && data.revision) {
       generateBarcodeDataUrl(data.revision, data.barcodeType, data.size.width * 0.45).then(setRevBarcodeUrl);
     } else {
       setRevBarcodeUrl('');
