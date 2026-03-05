@@ -149,7 +149,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                   </div>
                 </div>
                 {/* REV column with barcode */}
-                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${infoTopPadding}px`, gap: `${revGap}px` }}>
+                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${infoTopPadding}px`, paddingBottom: `${revBarcodeBottomPad}px`, gap: `${revGap}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>Rev.</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.revision || '—'}
