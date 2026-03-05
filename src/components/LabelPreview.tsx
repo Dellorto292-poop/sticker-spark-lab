@@ -69,7 +69,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const infoTopPadding = isLargeFormat ? 3 * scale : 0.4 * scale;
   const valueTopMargin = isLargeFormat ? 1 * scale : 0.2 * scale;
   const revGap = isLargeFormat ? 1.5 * scale : 0.5 * scale;
-  const revBarcodeWidth = isLargeFormat ? '95%' : '90%';
+  const revBarcodeWidth = '95%';
   const revBarcodeHeight = height * infoAreaRatio * scale * (isLargeFormat ? 0.50 : 0.38);
   const revBarcodeBottomPad = isLargeFormat ? 2 * scale : 0.5 * scale;
 
