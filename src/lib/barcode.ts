@@ -13,7 +13,7 @@ export async function generateBarcodeDataUrl(
   
   try {
     bwipjs.toCanvas(canvas, {
-      bcid: type === 'code128' ? 'code128' : 'code39',
+      bcid: 'code128',
       text: text,
       scale: 4,
       height: 20,

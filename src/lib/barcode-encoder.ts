@@ -171,5 +171,5 @@ export function encodeCode39(text: string): BarcodeBars {
 }
 
 export function encodeBarcode(text: string, type: 'code128' | 'code39'): BarcodeBars {
-  return type === 'code128' ? encodeCode128B(text) : encodeCode39(text);
+  return encodeCode128B(text);
 }
