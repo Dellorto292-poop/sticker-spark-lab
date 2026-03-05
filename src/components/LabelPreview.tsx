@@ -66,6 +66,11 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const valueScale = isCompactFormat ? 0.7 : 0.85;
 
   const qtyLabel = data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty';
+  const infoTopPadding = isLargeFormat ? 3 * scale : 0.4 * scale;
+  const valueTopMargin = isLargeFormat ? 1 * scale : 0.2 * scale;
+  const revGap = isLargeFormat ? 1.5 * scale : 0.5 * scale;
+  const revBarcodeWidth = isLargeFormat ? '90%' : '78%';
+  const revBarcodeHeight = height * infoAreaRatio * scale * (isLargeFormat ? 0.45 : 0.22);
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -136,14 +141,14 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             {isBoxTemplate ? (
               <>
                 {/* SKU column */}
-                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${3 * scale}px` }}>
+                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${infoTopPadding}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>SKU</div>
-                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1, marginTop: `${1 * scale}px` }}>
+                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1, marginTop: `${valueTopMargin}px` }}>
                     {data.sku || '—'}
                   </div>
                 </div>
                 {/* REV column with barcode */}
-                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${3 * scale}px`, gap: `${1.5 * scale}px` }}>
+                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${infoTopPadding}px`, gap: `${revGap}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>Rev.</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.revision || '—'}
@@ -153,19 +158,19 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                       src={revBarcodeUrl}
                       alt="rev barcode"
                       style={{
-                        width: '90%',
-                        height: `${height * infoAreaRatio * scale * 0.45}px`,
+                        width: revBarcodeWidth,
+                        height: `${revBarcodeHeight}px`,
                         objectFit: 'contain',
                       }}
                     />
                   )}
                 </div>
                 {/* QTY column */}
-                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${3 * scale}px` }}>
+                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${infoTopPadding}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>
                     {qtyLabel}
                   </div>
-                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1, marginTop: `${1 * scale}px` }}>
+                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1, marginTop: `${valueTopMargin}px` }}>
                     {data.boxQty ?? '—'}
                   </div>
                 </div>
