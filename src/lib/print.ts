@@ -12,7 +12,7 @@ export async function printLabel(data: LabelData): Promise<void> {
 
   // Generate revision barcode for box template
   let revBarcodeDataUrl = '';
-  if (data.template === 'box' && data.revision && data.revision.length === 2) {
+  if (data.template === 'box' && data.revision) {
     revBarcodeDataUrl = await generateBarcodeDataUrl(data.revision, data.barcodeType, width * 0.45);
   }
 

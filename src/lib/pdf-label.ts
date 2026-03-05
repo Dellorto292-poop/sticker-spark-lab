@@ -127,7 +127,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     pdf.text(data.revision || '—', revCx, infoTop + infoH * 0.45, { align: 'center' });
 
     // Revision barcode under REV value
-    if (data.revision && data.revision.length === 2) {
+    if (data.revision) {
       const revBcW = colW * 0.7;
       const revBcH = infoH * 0.35;
       const revBcX = revCx - revBcW / 2;
