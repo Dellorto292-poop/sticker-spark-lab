@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import type { LabelData } from './label-types';
 import { encodeBarcode, type BarcodeBars } from './barcode-encoder';
 
-const MM_TO_PT = 72 / 25.4; // ≈ 2.8346
+const MM_TO_PT = 72 / 25.4;
 
 // ── Font loading (Cyrillic support) ──
 let fontBase64Cache: string | null = null;
@@ -44,32 +44,24 @@ export function defaultGridConfig(labelW: number, labelH: number): GridConfig {
 
 /**
  * Draw a single label at (x, y) in mm coordinates on the given jsPDF instance.
+ * Layout: Description → Info row (SKU/REV/QTY) → Barcode. No borders.
  */
 function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const { width: w, height: h } = data.size;
   const isLarge = h > 100;
   const isDesign = data.template === 'design';
   const isCompactFormat = h <= 24;
-
   const isBox = data.template === 'box';
+
   const descRatio = isDesign ? 0 : (isLarge ? 0.25 : 0.24);
-  const tableRatio = isBox
+  const infoRatio = isBox
     ? (isLarge ? 0.15 : (isCompactFormat ? 0.24 : 0.18))
     : (isLarge ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
   const descH = h * descRatio;
-  const tableH = h * tableRatio;
-
-  // ── Border ──
-  pdf.setDrawColor(0);
-  pdf.setLineWidth(0.3);
-  pdf.rect(x, y, w, h);
+  const infoH = h * infoRatio;
 
   // ── Description area (skip for design template) ──
   if (!isDesign) {
-    pdf.setLineWidth(0.3);
-    pdf.line(x, y + descH, x + w, y + descH);
-
-    // Calculate description font size (matching LabelPreview logic)
     const descLen = Math.max((data.itemDescription || '—').length, 1);
     const descAreaW = w * 0.92;
     const minFont = isLarge ? 3.0 : 1.0;
@@ -83,7 +75,8 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     const titleFontMm = Math.max(minFont, Math.min(maxFontH, maxFontW, h * (isLarge ? 0.04 : 0.1)));
     const titleFontPt = titleFontMm * MM_TO_PT;
 
-    pdf.setFont('JetBrainsMono', 'bold');
+    // Use Helvetica for readability
+    pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(titleFontPt);
 
     const text = data.itemDescription || '—';
@@ -98,90 +91,75 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     }
   }
 
-  // ── Barcode (vector) ──
-  const barcodeH = h - descH - tableH;
-  const barcodeTop = y + descH;
-  const bcPadV = 2; // 2mm vertical
-  const bcPadH = 1; // 1mm horizontal
-  const bcAreaH = barcodeH - bcPadV * 2;
+  // ── Info row (SKU / REV / QTY) ──
+  const infoTop = y + descH;
+  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
+  const labelFontScale = isCompactFormat ? 0.4 : 0.5;
+  const valueFontScale = isCompactFormat ? 0.7 : 0.85;
+
+  if (isBox) {
+    const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
+    const cols: { label: string; value: string }[] = [
+      { label: 'SKU', value: data.sku || '—' },
+      { label: 'REV.', value: data.revision || '—' },
+      { label: qtyLabel, value: String(data.boxQty ?? '—') },
+    ];
+
+    const colW = w / cols.length;
+    for (let i = 0; i < cols.length; i++) {
+      const cx = x + i * colW + colW / 2;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
+      pdf.setTextColor(120);
+      pdf.text(cols[i].label, cx, infoTop + infoH * 0.35, { align: 'center' });
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
+      pdf.setTextColor(0);
+      pdf.text(cols[i].value, cx, infoTop + infoH * 0.78, { align: 'center' });
+    }
+  } else {
+    const midY = infoTop + infoH * 0.6;
+    const labelFontPt = baseFontMm * labelFontScale * MM_TO_PT;
+    const valueFontPt = baseFontMm * valueFontScale * MM_TO_PT;
+    const halfW = w / 2;
+
+    // SKU
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(labelFontPt);
+    pdf.setTextColor(120);
+    const skuLabelW = pdf.getTextWidth('SKU ');
+    const skuLabelX = x + halfW * 0.15;
+    pdf.text('SKU', skuLabelX, midY);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(valueFontPt);
+    pdf.setTextColor(0);
+    pdf.text(data.sku || '—', skuLabelX + skuLabelW, midY);
+
+    // Rev.
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(labelFontPt);
+    pdf.setTextColor(120);
+    const revLabelW = pdf.getTextWidth('Rev. ');
+    const revLabelX = x + halfW + halfW * 0.15;
+    pdf.text('Rev.', revLabelX, midY);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(valueFontPt);
+    pdf.setTextColor(0);
+    pdf.text(data.revision || '—', revLabelX + revLabelW, midY);
+  }
+
+  // ── Barcode (vector, narrower width ~80%) ──
+  const barcodeAreaH = h - descH - infoH;
+  const barcodeTop = y + descH + infoH;
+  const bcPadV = 2;
+  const bcPadH = w * 0.1; // 10% margin each side → 80% width
+  const bcAreaH = barcodeAreaH - bcPadV * 2;
   const bcAreaW = w - bcPadH * 2;
   const bcX0 = x + bcPadH;
 
   if (data.sku) {
     const encoded = encodeBarcode(data.sku, data.barcodeType);
     drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
-  }
-
-  // ── Table area ──
-  const tableTop = y + h - tableH;
-  pdf.setLineWidth(0.5);
-  pdf.line(x, tableTop, x + w, tableTop);
-
-  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
-  const labelFontScale = isCompactFormat ? 0.4 : 0.5;
-  const valueFontScale = isCompactFormat ? 0.7 : 0.85;
-
-  if (isBox) {
-    // Box template: vertical label/value columns (SKU, Rev, Qty)
-    const cols: { label: string; value: string }[] = [
-      { label: 'SKU', value: data.sku || '—' },
-      { label: 'REV.', value: data.revision || '—' },
-    ];
-    const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
-    cols.push({ label: qtyLabel, value: String(data.boxQty ?? '—') });
-
-    const colW = w / cols.length;
-    for (let i = 0; i < cols.length; i++) {
-      const cx = x + i * colW + colW / 2;
-      pdf.setFont('courier', 'bold');
-      pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
-      pdf.setTextColor(100);
-      pdf.text(cols[i].label, cx, tableTop + tableH * 0.3, { align: 'center' });
-      pdf.setFont('courier', 'bold');
-      pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
-      pdf.setTextColor(0);
-      pdf.text(cols[i].value, cx, tableTop + tableH * 0.76, { align: 'center' });
-      if (i < cols.length - 1) {
-        pdf.setLineWidth(0.3);
-        pdf.setDrawColor(0);
-        pdf.line(x + (i + 1) * colW, tableTop, x + (i + 1) * colW, y + h);
-      }
-    }
-  } else {
-    // Individual/design: horizontal "SKU value | Rev. value"
-    const halfW = w / 2;
-    const midY = tableTop + tableH * 0.6;
-    const labelFontPt = baseFontMm * labelFontScale * MM_TO_PT;
-    const valueFontPt = baseFontMm * valueFontScale * MM_TO_PT;
-
-    // SKU
-    pdf.setFont('courier', 'bold');
-    pdf.setFontSize(labelFontPt);
-    pdf.setTextColor(100);
-    const skuLabelW = pdf.getTextWidth('SKU ');
-    const skuLabelX = x + halfW * 0.15;
-    pdf.text('SKU', skuLabelX, midY);
-    pdf.setFont('courier', 'bold');
-    pdf.setFontSize(valueFontPt);
-    pdf.setTextColor(0);
-    pdf.text(data.sku || '—', skuLabelX + skuLabelW, midY);
-
-    // Separator
-    pdf.setLineWidth(0.3);
-    pdf.setDrawColor(0);
-    pdf.line(x + halfW, tableTop, x + halfW, y + h);
-
-    // Rev.
-    pdf.setFont('courier', 'bold');
-    pdf.setFontSize(labelFontPt);
-    pdf.setTextColor(100);
-    const revLabelW = pdf.getTextWidth('Rev. ');
-    const revLabelX = x + halfW + halfW * 0.15;
-    pdf.text('Rev.', revLabelX, midY);
-    pdf.setFont('courier', 'bold');
-    pdf.setFontSize(valueFontPt);
-    pdf.setTextColor(0);
-    pdf.text(data.revision || '—', revLabelX + revLabelW, midY);
   }
 
   pdf.setTextColor(0);
@@ -208,14 +186,12 @@ function drawBarcode(pdf: jsPDF, encoded: BarcodeBars, x: number, y: number, are
 export async function generateThermalPdf(data: LabelData): Promise<void> {
   const { width, height } = data.size;
 
-  // Open window IMMEDIATELY (synchronous) to avoid popup blocker
   const printWindow = window.open('', '_blank', `width=${Math.max(width * 4, 400)},height=${Math.max(height * 4, 400)}`);
   if (!printWindow) {
     await downloadVectorPdf(data);
     return;
   }
 
-  // Generate vector PDF with exact label page size
   const pdf = new jsPDF({
     orientation: width > height ? 'landscape' : 'portrait',
     unit: 'mm',
@@ -229,13 +205,11 @@ export async function generateThermalPdf(data: LabelData): Promise<void> {
 
   const blobUrl = pdf.output('bloburl') as unknown as string;
 
-  // Validate blob URL to prevent injection
   if (typeof blobUrl !== 'string' || !blobUrl.startsWith('blob:')) {
     printWindow.close();
     throw new Error('Invalid PDF blob URL');
   }
 
-  // Use DOM APIs instead of document.write to avoid XSS risk
   const doc = printWindow.document;
   doc.open();
   doc.write('<!DOCTYPE html><html><head><title>Label</title></head><body></body></html>');
@@ -256,7 +230,6 @@ export async function generateThermalPdf(data: LabelData): Promise<void> {
 
 /**
  * Generate a vector PDF on A4 with a grid of labels.
- * Opens in a new tab for printing.
  */
 export async function generateA4GridPdf(data: LabelData, config: GridConfig): Promise<void> {
   const { cols, rows, hGapMm, vGapMm, marginMm } = config;
