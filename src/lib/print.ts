@@ -78,10 +78,16 @@ export async function printLabel(data: LabelData): Promise<void> {
   <meta charset="utf-8">
   <title>Label Print</title>
   <style>
+    @font-face {
+      font-family: 'LabelFont';
+      src: url('/fonts/JetBrainsMono-Bold.ttf') format('truetype');
+      font-weight: bold;
+      font-style: normal;
+    }
     @page { size: ${width}mm ${height}mm; margin: 0; }
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:${width}mm; height:${height}mm; margin:0; padding:0; }
-    body { font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; color:#000; background:#fff; }
+    body { font-family:'LabelFont','Helvetica Neue',Helvetica,Arial,sans-serif; color:#000; background:#fff; }
     .label { position:relative; width:${width}mm; height:${height}mm; overflow:hidden; }
     .desc { position:absolute; top:0; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
     .barcode { position:absolute; top:${descAreaH}mm; bottom:${infoH}mm; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }

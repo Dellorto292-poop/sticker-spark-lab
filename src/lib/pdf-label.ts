@@ -70,7 +70,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     const titleFontMm = Math.max(minFont, Math.min(maxFontH, maxFontW, h * (isLarge ? 0.04 : 0.1)));
     const titleFontPt = titleFontMm * MM_TO_PT;
 
-    pdf.setFont('helvetica', 'bold');
+    pdf.setFont('JetBrainsMono', 'bold');
     pdf.setFontSize(titleFontPt);
 
     const descTop = y;
@@ -112,7 +112,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
     // SKU column
     const skuCx = x + colW * 0.5;
-    pdf.setFont('helvetica', 'bold');
+    pdf.setFont('JetBrainsMono', 'bold');
     pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
     pdf.setTextColor(0);
     pdf.text('SKU', skuCx, infoTop + infoH * 0.2, { align: 'center' });
@@ -152,11 +152,11 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     const colW = w / cols.length;
     for (let i = 0; i < cols.length; i++) {
       const cx = x + i * colW + colW / 2;
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFont('JetBrainsMono', 'bold');
       pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
       pdf.setTextColor(0);
       pdf.text(cols[i].label, cx, infoTop + infoH * 0.35, { align: 'center' });
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFont('JetBrainsMono', 'bold');
       pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
       pdf.setTextColor(0);
       pdf.text(cols[i].value, cx, infoTop + infoH * 0.78, { align: 'center' });
