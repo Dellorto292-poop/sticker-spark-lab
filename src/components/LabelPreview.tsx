@@ -43,7 +43,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   // Box template gets taller info area to fit revision barcode
   const infoAreaRatio = isBoxTemplate
-    ? (isLargeFormat ? 0.38 : (isCompactFormat ? 0.36 : 0.38))
+    ? (isLargeFormat ? 0.40 : (isCompactFormat ? 0.38 : 0.40))
     : (isLargeFormat ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
 
   // Description font sizing
