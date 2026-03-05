@@ -43,7 +43,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   // Box template gets taller info area to fit revision barcode
   const infoAreaRatio = isBoxTemplate
-    ? (isLargeFormat ? 0.30 : (isCompactFormat ? 0.28 : 0.30))
+    ? (isLargeFormat ? 0.38 : (isCompactFormat ? 0.36 : 0.38))
     : (isLargeFormat ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
 
   // Description font sizing
@@ -70,7 +70,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const valueTopMargin = isLargeFormat ? 1 * scale : 0.2 * scale;
   const revGap = isLargeFormat ? 1.5 * scale : 0.5 * scale;
   const revBarcodeWidth = isLargeFormat ? '90%' : '78%';
-  const revBarcodeHeight = height * infoAreaRatio * scale * (isLargeFormat ? 0.45 : 0.22);
+  const revBarcodeHeight = height * infoAreaRatio * scale * (isLargeFormat ? 0.50 : 0.35);
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -121,7 +121,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               <img
                 src={barcodeUrl}
                 alt="barcode"
-                style={{ width: '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
+                style={{ width: isBoxTemplate ? '70%' : '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
               />
             ) : (
               <div

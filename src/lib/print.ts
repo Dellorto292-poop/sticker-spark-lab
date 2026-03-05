@@ -22,7 +22,7 @@ export async function printLabel(data: LabelData): Promise<void> {
 
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   const infoAreaRatio = isBoxTemplate
-    ? (isLargeFormat ? 0.30 : (isCompactFormat ? 0.28 : 0.30))
+    ? (isLargeFormat ? 0.38 : (isCompactFormat ? 0.36 : 0.38))
     : (isLargeFormat ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
 
   const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
@@ -52,7 +52,7 @@ export async function printLabel(data: LabelData): Promise<void> {
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm; gap:0.5mm;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">REV.</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.revision || '—')}</div>
-        ${revBarcodeDataUrl ? `<img src="${revBarcodeDataUrl}" style="width:85%; height:${infoH * 0.45}mm; object-fit:contain;" alt="rev barcode">` : ''}
+        ${revBarcodeDataUrl ? `<img src="${revBarcodeDataUrl}" style="width:90%; height:${infoH * 0.50}mm; object-fit:contain;" alt="rev barcode">` : ''}
       </div>
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">${qtyLabel}</div>
@@ -86,7 +86,7 @@ export async function printLabel(data: LabelData): Promise<void> {
     .desc { position:absolute; top:0; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
     .barcode { position:absolute; top:${descAreaH}mm; bottom:${infoH}mm; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
     .info { position:absolute; bottom:0; left:0; right:0; height:${infoH}mm; display:flex; }
-    .barcode img { width:80%; height:100%; object-fit:${isLargeFormat ? 'contain' : 'fill'}; }
+    .barcode img { width:${isBoxTemplate ? '70%' : '80%'}; height:100%; object-fit:${isLargeFormat ? 'contain' : 'fill'}; }
   </style>
 </head>
 <body>

@@ -50,7 +50,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
   const descRatio = isDesign ? 0 : (isLarge ? 0.25 : 0.24);
   const infoRatio = isBox
-    ? (isLarge ? 0.30 : (isCompactFormat ? 0.28 : 0.30))
+    ? (isLarge ? 0.38 : (isCompactFormat ? 0.36 : 0.38))
     : (isLarge ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
   const descH = h * descRatio;
   const infoH = h * infoRatio;
@@ -90,7 +90,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const barcodeAreaH = h - descH - infoH;
   const barcodeTop = y + descH;
   const bcPadV = 2;
-  const bcPadH = w * 0.1;
+  const bcPadH = isBox ? w * 0.15 : w * 0.1;
   const bcAreaH = barcodeAreaH - bcPadV * 2;
   const bcAreaW = w - bcPadH * 2;
   const bcX0 = x + bcPadH;
@@ -128,8 +128,8 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
     // Revision barcode under REV value
     if (data.revision) {
-      const revBcW = colW * 0.7;
-      const revBcH = infoH * 0.35;
+      const revBcW = colW * 0.85;
+      const revBcH = infoH * 0.45;
       const revBcX = revCx - revBcW / 2;
       const revBcY = infoTop + infoH * 0.55;
       const revEncoded = encodeBarcode(data.revision, data.barcodeType);
