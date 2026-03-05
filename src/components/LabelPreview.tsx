@@ -8,6 +8,7 @@ interface Props {
 
 const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const [barcodeUrl, setBarcodeUrl] = useState('');
+  const [revBarcodeUrl, setRevBarcodeUrl] = useState('');
 
   useEffect(() => {
     if (data.sku) {
@@ -16,6 +17,15 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
       setBarcodeUrl('');
     }
   }, [data.sku, data.barcodeType, data.size.width]);
+
+  // Generate revision barcode for box template
+  useEffect(() => {
+    if (data.template === 'box' && data.revision && data.revision.length === 2) {
+      generateBarcodeDataUrl(data.revision, data.barcodeType, data.size.width * 0.3).then(setRevBarcodeUrl);
+    } else {
+      setRevBarcodeUrl('');
+    }
+  }, [data.revision, data.template, data.barcodeType, data.size.width]);
 
   const { width, height } = data.size;
   const isLargeFormat = height > 100;
@@ -31,8 +41,9 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const isBoxTemplate = data.template === 'box';
 
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
+  // Box template gets taller info area to fit revision barcode
   const infoAreaRatio = isBoxTemplate
-    ? (isLargeFormat ? 0.18 : (isCompactFormat ? 0.28 : 0.22))
+    ? (isLargeFormat ? 0.30 : (isCompactFormat ? 0.28 : 0.30))
     : (isLargeFormat ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
 
   // Description font sizing
@@ -124,18 +135,32 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           >
             {isBoxTemplate ? (
               <>
+                {/* SKU column */}
                 <div className="flex-1 flex flex-col items-center justify-center leading-none">
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>SKU</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.sku || '—'}
                   </div>
                 </div>
-                <div className="flex-1 flex flex-col items-center justify-center leading-none">
+                {/* REV column with barcode */}
+                <div className="flex-1 flex flex-col items-center justify-center leading-none" style={{ gap: `${1 * scale}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>Rev.</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.revision || '—'}
                   </div>
+                  {revBarcodeUrl && (
+                    <img
+                      src={revBarcodeUrl}
+                      alt="rev barcode"
+                      style={{
+                        width: '80%',
+                        height: `${height * infoAreaRatio * scale * 0.35}px`,
+                        objectFit: 'contain',
+                      }}
+                    />
+                  )}
                 </div>
+                {/* QTY column */}
                 <div className="flex-1 flex flex-col items-center justify-center leading-none">
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>
                     {qtyLabel}

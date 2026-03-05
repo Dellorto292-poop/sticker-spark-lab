@@ -10,13 +10,19 @@ export async function printLabel(data: LabelData): Promise<void> {
     barcodeDataUrl = await generateBarcodeDataUrl(data.sku, data.barcodeType, width);
   }
 
+  // Generate revision barcode for box template
+  let revBarcodeDataUrl = '';
+  if (data.template === 'box' && data.revision && data.revision.length === 2) {
+    revBarcodeDataUrl = await generateBarcodeDataUrl(data.revision, data.barcodeType, width * 0.3);
+  }
+
   const isBoxTemplate = data.template === 'box';
   const isDesign = data.template === 'design';
   const isCompactFormat = height <= 24;
 
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   const infoAreaRatio = isBoxTemplate
-    ? (isLargeFormat ? 0.18 : (isCompactFormat ? 0.28 : 0.22))
+    ? (isLargeFormat ? 0.30 : (isCompactFormat ? 0.28 : 0.30))
     : (isLargeFormat ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
 
   const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
@@ -34,20 +40,25 @@ export async function printLabel(data: LabelData): Promise<void> {
   const titleFontSize = Math.max(minFontSize, Math.min(maxFontByHeight, maxFontByWidth, height * (isLargeFormat ? 0.04 : 0.1)));
 
   const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
+  const infoH = height * infoAreaRatio;
 
   let infoHtml: string;
   if (isBoxTemplate) {
-    const cols = [
-      { label: 'SKU', value: data.sku || '—' },
-      { label: 'REV.', value: data.revision || '—' },
-      { label: qtyLabel, value: String(data.boxQty ?? '—') },
-    ];
-    infoHtml = cols.map((col) => `
+    infoHtml = `
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">${col.label}</div>
-        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${col.value}</div>
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">SKU</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.sku || '—')}</div>
       </div>
-    `).join('');
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.5mm;">
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">REV.</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.revision || '—')}</div>
+        ${revBarcodeDataUrl ? `<img src="${revBarcodeDataUrl}" style="width:70%; height:${infoH * 0.35}mm; object-fit:contain;" alt="rev barcode">` : ''}
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">${qtyLabel}</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${String(data.boxQty ?? '—')}</div>
+      </div>
+    `;
   } else {
     infoHtml = `
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
@@ -73,8 +84,8 @@ export async function printLabel(data: LabelData): Promise<void> {
     body { font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; color:#000; background:#fff; }
     .label { position:relative; width:${width}mm; height:${height}mm; overflow:hidden; }
     .desc { position:absolute; top:0; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
-    .barcode { position:absolute; top:${descAreaH}mm; bottom:${height * infoAreaRatio}mm; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
-    .info { position:absolute; bottom:0; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
+    .barcode { position:absolute; top:${descAreaH}mm; bottom:${infoH}mm; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
+    .info { position:absolute; bottom:0; left:0; right:0; height:${infoH}mm; display:flex; }
     .barcode img { width:80%; height:100%; object-fit:${isLargeFormat ? 'contain' : 'fill'}; }
   </style>
 </head>
