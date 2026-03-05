@@ -30,17 +30,15 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const isCompactFormat = height <= 24;
   const isBoxTemplate = data.template === 'box';
 
-  // Layout ratios — description on top, then info row, then barcode
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   const infoAreaRatio = isBoxTemplate
     ? (isLargeFormat ? 0.15 : (isCompactFormat ? 0.24 : 0.18))
     : (isLargeFormat ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
 
-  // Font sizing for description
+  // Description font sizing
   const descLen = Math.max(data.itemDescription.length, 1);
   const descAreaH = height * descAreaRatio;
   const descAreaW = width * 0.92;
-
   const minFontSize = isLargeFormat ? 3.0 : 1.0;
   const idealFontH = height * (isLargeFormat ? 0.03 : 0.08);
   const idealLines = Math.ceil(descAreaH / (idealFontH * 1.3));
@@ -56,7 +54,6 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const labelScale = isCompactFormat ? 0.4 : 0.5;
   const valueScale = isCompactFormat ? 0.7 : 0.85;
 
-  // Qty label
   const qtyLabel = data.qtyType === 'pallet' ? 'Pallet Qty' : data.qtyType === 'set' ? 'Set Qty' : 'Box Qty';
 
   return (
@@ -76,7 +73,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             '--print-scale-y': `${(height * 3.7795) / scaledH}`,
           } as React.CSSProperties}
         >
-          {/* Item Description (top area) — hidden for design template */}
+          {/* Description (top) */}
           {!isDesign && (
             <div
               className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center"
@@ -95,13 +92,35 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             </div>
           )}
 
-          {/* Info row (SKU / REV / QTY) — below description, above barcode */}
+          {/* Barcode (middle) */}
           <div
-            className="absolute left-0 right-0 flex"
+            className="absolute left-0 right-0 flex flex-col items-center justify-center"
             style={{
               top: `${descAreaH * scale}px`,
-              height: `${height * infoAreaRatio * scale}px`,
+              bottom: `${height * infoAreaRatio * scale}px`,
+              padding: `${2 * scale}px ${1 * scale}px`,
             }}
+          >
+            {barcodeUrl ? (
+              <img
+                src={barcodeUrl}
+                alt="barcode"
+                style={{ width: '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center text-muted-foreground border border-dashed border-border"
+                style={{ width: '80%', height: '80%', fontSize: `${baseFontSize * scale * 0.7}px` }}
+              >
+                [barcode]
+              </div>
+            )}
+          </div>
+
+          {/* Info row (bottom) — SKU / REV / QTY */}
+          <div
+            className="absolute bottom-0 left-0 right-0 flex"
+            style={{ height: `${height * infoAreaRatio * scale}px` }}
           >
             {isBoxTemplate ? (
               <>
@@ -141,30 +160,6 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                   </div>
                 </div>
               </>
-            )}
-          </div>
-
-          {/* Barcode (bottom area) */}
-          <div
-            className="absolute left-0 right-0 bottom-0 flex flex-col items-center justify-center"
-            style={{
-              top: `${(descAreaH + height * infoAreaRatio) * scale}px`,
-              padding: `${2 * scale}px ${1 * scale}px`,
-            }}
-          >
-            {barcodeUrl ? (
-              <img
-                src={barcodeUrl}
-                alt="barcode"
-                style={{ width: '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
-              />
-            ) : (
-              <div
-                className="flex items-center justify-center text-muted-foreground border border-dashed border-border"
-                style={{ width: '80%', height: '80%', fontSize: `${baseFontSize * scale * 0.7}px` }}
-              >
-                [barcode]
-              </div>
             )}
           </div>
         </div>

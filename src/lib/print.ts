@@ -1,10 +1,6 @@
 import type { LabelData } from './label-types';
 import { generateBarcodeDataUrl } from './barcode';
 
-/**
- * Opens a popup window with the label rendered at exact mm dimensions,
- * sets @page size to match, and triggers window.print().
- */
 export async function printLabel(data: LabelData): Promise<void> {
   const { width, height } = data.size;
   const isLargeFormat = height > 100;
@@ -24,11 +20,9 @@ export async function printLabel(data: LabelData): Promise<void> {
     : (isLargeFormat ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
 
   const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
-
-  // Title font sizing
-  const descLen = Math.max(data.itemDescription.length, 1);
   const descAreaH = height * descAreaRatio;
   const descAreaW = width * 0.92;
+  const descLen = Math.max(data.itemDescription.length, 1);
   const minFontSize = isLargeFormat ? 3.0 : 1.0;
   const idealFontH = height * (isLargeFormat ? 0.03 : 0.08);
   const idealLines = Math.ceil(descAreaH / (idealFontH * 1.3));
@@ -41,7 +35,6 @@ export async function printLabel(data: LabelData): Promise<void> {
 
   const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
 
-  // Build info row columns
   let infoHtml: string;
   if (isBoxTemplate) {
     const cols = [
@@ -50,15 +43,9 @@ export async function printLabel(data: LabelData): Promise<void> {
       { label: qtyLabel, value: String(data.boxQty ?? '—') },
     ];
     infoHtml = cols.map((col) => `
-      <div style="
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      ">
-        <div style="font-size: ${fontSize * 0.5}mm; font-weight: 600; opacity: 0.5; text-transform: uppercase; white-space: nowrap;">${col.label}</div>
-        <div style="font-size: ${fontSize * 0.85}mm; font-weight: bold;">${col.value}</div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; opacity:0.5; text-transform:uppercase; white-space:nowrap;">${col.label}</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${col.value}</div>
       </div>
     `).join('');
   } else {
@@ -80,110 +67,33 @@ export async function printLabel(data: LabelData): Promise<void> {
   <meta charset="utf-8">
   <title>Label Print</title>
   <style>
-    @page {
-      size: ${width}mm ${height}mm;
-      margin: 0;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    html, body {
-      width: ${width}mm;
-      height: ${height}mm;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      color: #000;
-      background: #fff;
-    }
-    
-    .label {
-      position: relative;
-      width: ${width}mm;
-      height: ${height}mm;
-      overflow: hidden;
-    }
-    
-    .desc {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: ${descAreaH}mm;
-      padding: 2% 4%;
-      font-size: ${titleFontSize}mm;
-      font-weight: bold;
-      line-height: 1.2;
-      text-align: center;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: ${descMaxLines};
-      -webkit-box-orient: vertical;
-      overflow-wrap: break-word;
-    }
-    
-    .info {
-      position: absolute;
-      top: ${descAreaH}mm;
-      left: 0; right: 0;
-      height: ${height * infoAreaRatio}mm;
-      display: flex;
-    }
-    
-    .barcode {
-      position: absolute;
-      top: ${descAreaH + height * infoAreaRatio}mm;
-      bottom: 0;
-      left: 0; right: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2mm 1mm;
-    }
-    
-    .barcode img {
-      width: 80%;
-      height: 100%;
-      object-fit: ${isLargeFormat ? 'contain' : 'fill'};
-    }
+    @page { size: ${width}mm ${height}mm; margin: 0; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:${width}mm; height:${height}mm; margin:0; padding:0; }
+    body { font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; color:#000; background:#fff; }
+    .label { position:relative; width:${width}mm; height:${height}mm; overflow:hidden; }
+    .desc { position:absolute; top:0; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
+    .barcode { position:absolute; top:${descAreaH}mm; bottom:${height * infoAreaRatio}mm; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
+    .barcode img { width:80%; height:100%; object-fit:${isLargeFormat ? 'contain' : 'fill'}; }
+    .info { position:absolute; bottom:0; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
   </style>
 </head>
 <body>
   <div class="label">
     ${!isDesign ? `<div class="desc">${escapeHtml(data.itemDescription || '—')}</div>` : ''}
-    <div class="info">
-      ${infoHtml}
-    </div>
     <div class="barcode">
       ${barcodeDataUrl ? `<img src="${barcodeDataUrl}" alt="barcode">` : '<div>[barcode]</div>'}
     </div>
+    <div class="info">${infoHtml}</div>
   </div>
   <script>
-    Promise.all([
-      document.fonts.ready,
-      ...Array.from(document.images).map(img => 
-        img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })
-      )
-    ]).then(() => {
-      setTimeout(() => {
-        window.print();
-        window.close();
-      }, 200);
-    });
+    Promise.all([document.fonts.ready,...Array.from(document.images).map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r;}))]).then(()=>{setTimeout(()=>{window.print();window.close();},200);});
   </script>
 </body>
 </html>`;
 
   const printWindow = window.open('', '_blank', `width=${Math.max(width * 4, 400)},height=${Math.max(height * 4, 400)}`);
-  if (!printWindow) {
-    console.error('Popup blocked — please allow popups for printing');
-    return;
-  }
+  if (!printWindow) { console.error('Popup blocked'); return; }
   printWindow.document.write(html);
   printWindow.document.close();
 }
