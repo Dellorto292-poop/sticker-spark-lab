@@ -13,7 +13,7 @@ export async function printLabel(data: LabelData): Promise<void> {
   // Generate revision barcode for box template
   let revBarcodeDataUrl = '';
   if (data.template === 'box' && data.revision) {
-    revBarcodeDataUrl = await generateBarcodeDataUrl(data.revision, data.barcodeType, width * 0.45);
+    revBarcodeDataUrl = await generateBarcodeDataUrl(data.revision, data.barcodeType, width * 0.7);
   }
 
   const isBoxTemplate = data.template === 'box';
@@ -49,10 +49,10 @@ export async function printLabel(data: LabelData): Promise<void> {
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">SKU</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold; margin-top:0.5mm;">${escapeHtml(data.sku || '—')}</div>
       </div>
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm; gap:0.5mm;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm; padding-bottom:0.5mm; gap:0.5mm;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">REV.</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.revision || '—')}</div>
-        ${revBarcodeDataUrl ? `<img src="${revBarcodeDataUrl}" style="width:90%; height:${infoH * 0.50}mm; object-fit:contain;" alt="rev barcode">` : ''}
+        ${revBarcodeDataUrl ? `<img src="${revBarcodeDataUrl}" style="width:95%; height:${infoH * 0.46}mm; object-fit:contain;" alt="rev barcode">` : ''}
       </div>
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">${qtyLabel}</div>
