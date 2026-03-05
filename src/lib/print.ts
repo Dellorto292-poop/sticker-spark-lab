@@ -13,7 +13,7 @@ export async function printLabel(data: LabelData): Promise<void> {
   // Generate revision barcode for box template
   let revBarcodeDataUrl = '';
   if (data.template === 'box' && data.revision && data.revision.length === 2) {
-    revBarcodeDataUrl = await generateBarcodeDataUrl(data.revision, data.barcodeType, width * 0.3);
+    revBarcodeDataUrl = await generateBarcodeDataUrl(data.revision, data.barcodeType, width * 0.45);
   }
 
   const isBoxTemplate = data.template === 'box';
@@ -45,18 +45,18 @@ export async function printLabel(data: LabelData): Promise<void> {
   let infoHtml: string;
   if (isBoxTemplate) {
     infoHtml = `
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">SKU</div>
-        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.sku || '—')}</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold; margin-top:0.5mm;">${escapeHtml(data.sku || '—')}</div>
       </div>
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.5mm;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm; gap:0.5mm;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">REV.</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.revision || '—')}</div>
-        ${revBarcodeDataUrl ? `<img src="${revBarcodeDataUrl}" style="width:70%; height:${infoH * 0.35}mm; object-fit:contain;" alt="rev barcode">` : ''}
+        ${revBarcodeDataUrl ? `<img src="${revBarcodeDataUrl}" style="width:85%; height:${infoH * 0.45}mm; object-fit:contain;" alt="rev barcode">` : ''}
       </div>
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:1.5mm;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">${qtyLabel}</div>
-        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${String(data.boxQty ?? '—')}</div>
+        <div style="font-size:${fontSize * 0.85}mm; font-weight:bold; margin-top:0.5mm;">${String(data.boxQty ?? '—')}</div>
       </div>
     `;
   } else {

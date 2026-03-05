@@ -21,7 +21,7 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   // Generate revision barcode for box template
   useEffect(() => {
     if (data.template === 'box' && data.revision && data.revision.length === 2) {
-      generateBarcodeDataUrl(data.revision, data.barcodeType, data.size.width * 0.3).then(setRevBarcodeUrl);
+      generateBarcodeDataUrl(data.revision, data.barcodeType, data.size.width * 0.45).then(setRevBarcodeUrl);
     } else {
       setRevBarcodeUrl('');
     }
@@ -136,14 +136,14 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             {isBoxTemplate ? (
               <>
                 {/* SKU column */}
-                <div className="flex-1 flex flex-col items-center justify-center leading-none">
+                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${3 * scale}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>SKU</div>
-                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
+                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1, marginTop: `${1 * scale}px` }}>
                     {data.sku || '—'}
                   </div>
                 </div>
                 {/* REV column with barcode */}
-                <div className="flex-1 flex flex-col items-center justify-center leading-none" style={{ gap: `${1 * scale}px` }}>
+                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${3 * scale}px`, gap: `${1.5 * scale}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>Rev.</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.revision || '—'}
@@ -153,19 +153,19 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                       src={revBarcodeUrl}
                       alt="rev barcode"
                       style={{
-                        width: '80%',
-                        height: `${height * infoAreaRatio * scale * 0.35}px`,
+                        width: '90%',
+                        height: `${height * infoAreaRatio * scale * 0.45}px`,
                         objectFit: 'contain',
                       }}
                     />
                   )}
                 </div>
                 {/* QTY column */}
-                <div className="flex-1 flex flex-col items-center justify-center leading-none">
+                <div className="flex-1 flex flex-col items-center justify-start leading-none" style={{ paddingTop: `${3 * scale}px` }}>
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>
                     {qtyLabel}
                   </div>
-                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
+                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1, marginTop: `${1 * scale}px` }}>
                     {data.boxQty ?? '—'}
                   </div>
                 </div>
