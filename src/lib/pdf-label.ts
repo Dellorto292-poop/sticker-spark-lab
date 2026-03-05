@@ -58,13 +58,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const descH = h * descRatio;
   const infoH = h * infoRatio;
 
-  // ── Info row (top) ──
-  const infoTop = y;
-  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
-  const labelFontScale = isCompactFormat ? 0.4 : 0.5;
-  const valueFontScale = isCompactFormat ? 0.7 : 0.85;
-
-  // ── Description (after info row) ──
+  // ── Description (top) ──
   if (!isDesign) {
     const descLen = Math.max((data.itemDescription || '—').length, 1);
     const descAreaW = w * 0.92;
@@ -82,7 +76,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(titleFontPt);
 
-    const descTop = y + infoH;
+    const descTop = y;
     const text = data.itemDescription || '—';
     const lines = pdf.splitTextToSize(text, descAreaW);
     const clampedLines = lines.slice(0, maxLines);
@@ -94,6 +88,26 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
       pdf.text(clampedLines[i], x + w / 2, textStartY + i * lineH, { align: 'center' });
     }
   }
+
+  // ── Barcode (middle, 80% width) ──
+  const barcodeAreaH = h - descH - infoH;
+  const barcodeTop = y + descH;
+  const bcPadV = 2;
+  const bcPadH = w * 0.1;
+  const bcAreaH = barcodeAreaH - bcPadV * 2;
+  const bcAreaW = w - bcPadH * 2;
+  const bcX0 = x + bcPadH;
+
+  if (data.sku) {
+    const encoded = encodeBarcode(data.sku, data.barcodeType);
+    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
+  }
+
+  // ── Info row (bottom, labels above values) ──
+  const infoTop = y + h - infoH;
+  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
+  const labelFontScale = isCompactFormat ? 0.4 : 0.5;
+  const valueFontScale = isCompactFormat ? 0.7 : 0.85;
 
   if (isBox) {
     const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
@@ -116,46 +130,23 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
       pdf.text(cols[i].value, cx, infoTop + infoH * 0.78, { align: 'center' });
     }
   } else {
-    const midY = infoTop + infoH * 0.6;
-    const labelFontPt = baseFontMm * labelFontScale * MM_TO_PT;
-    const valueFontPt = baseFontMm * valueFontScale * MM_TO_PT;
-    const halfW = w / 2;
+    const cols: { label: string; value: string }[] = [
+      { label: 'SKU', value: data.sku || '—' },
+      { label: 'REV.', value: data.revision || '—' },
+    ];
 
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(labelFontPt);
-    pdf.setTextColor(0);
-    const skuLabelW = pdf.getTextWidth('SKU ');
-    const skuLabelX = x + halfW * 0.15;
-    pdf.text('SKU', skuLabelX, midY);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(valueFontPt);
-    pdf.setTextColor(0);
-    pdf.text(data.sku || '—', skuLabelX + skuLabelW, midY);
-
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(labelFontPt);
-    pdf.setTextColor(0);
-    const revLabelW = pdf.getTextWidth('Rev. ');
-    const revLabelX = x + halfW + halfW * 0.15;
-    pdf.text('Rev.', revLabelX, midY);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(valueFontPt);
-    pdf.setTextColor(0);
-    pdf.text(data.revision || '—', revLabelX + revLabelW, midY);
-  }
-
-  // ── Barcode (bottom, 80% width) ──
-  const barcodeAreaH = h - descH - infoH;
-  const barcodeTop = y + infoH + descH;
-  const bcPadV = 2;
-  const bcPadH = w * 0.1;
-  const bcAreaH = barcodeAreaH - bcPadV * 2;
-  const bcAreaW = w - bcPadH * 2;
-  const bcX0 = x + bcPadH;
-
-  if (data.sku) {
-    const encoded = encodeBarcode(data.sku, data.barcodeType);
-    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
+    const colW = w / cols.length;
+    for (let i = 0; i < cols.length; i++) {
+      const cx = x + i * colW + colW / 2;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
+      pdf.setTextColor(0);
+      pdf.text(cols[i].label, cx, infoTop + infoH * 0.35, { align: 'center' });
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
+      pdf.setTextColor(0);
+      pdf.text(cols[i].value, cx, infoTop + infoH * 0.78, { align: 'center' });
+    }
   }
 
   pdf.setTextColor(0);

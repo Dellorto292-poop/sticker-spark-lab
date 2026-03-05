@@ -73,12 +73,54 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             '--print-scale-y': `${(height * 3.7795) / scaledH}`,
           } as React.CSSProperties}
         >
-          {/* Info row (top) — SKU / REV / QTY */}
+          {/* Description (top) */}
+          {!isDesign && (
+            <div
+              className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center"
+              style={{
+                height: `${descAreaH * scale}px`,
+                fontSize: `${titleFontSize * scale}px`,
+                lineHeight: 1.2,
+                display: '-webkit-box',
+                WebkitLineClamp: descMaxLines,
+                WebkitBoxOrient: 'vertical',
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
+              }}
+            >
+              {data.itemDescription || '—'}
+            </div>
+          )}
+
+          {/* Barcode (middle) */}
           <div
-            className="absolute left-0 right-0 top-0 flex"
+            className="absolute left-0 right-0 flex flex-col items-center justify-center"
             style={{
-              height: `${height * infoAreaRatio * scale}px`,
+              top: `${descAreaH * scale}px`,
+              bottom: `${height * infoAreaRatio * scale}px`,
+              padding: `${2 * scale}px ${1 * scale}px`,
             }}
+          >
+            {barcodeUrl ? (
+              <img
+                src={barcodeUrl}
+                alt="barcode"
+                style={{ width: '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center text-muted-foreground border border-dashed border-border"
+                style={{ width: '80%', height: '80%', fontSize: `${baseFontSize * scale * 0.7}px` }}
+              >
+                [barcode]
+              </div>
+            )}
+          </div>
+
+          {/* Info row (bottom) — labels above values */}
+          <div
+            className="absolute bottom-0 left-0 right-0 flex"
+            style={{ height: `${height * infoAreaRatio * scale}px` }}
           >
             {isBoxTemplate ? (
               <>
@@ -105,63 +147,19 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
               </>
             ) : (
               <>
-                <div className="flex-1 flex items-center justify-center gap-[2%] leading-none px-[3%]">
+                <div className="flex-1 flex flex-col items-center justify-center leading-none">
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>SKU</div>
-                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1 }}>
+                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.sku || '—'}
                   </div>
                 </div>
-                <div className="flex-1 flex items-center justify-center gap-[2%] leading-none px-[3%]">
+                <div className="flex-1 flex flex-col items-center justify-center leading-none">
                   <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>Rev.</div>
-                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1 }}>
+                  <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.revision || '—'}
                   </div>
                 </div>
               </>
-            )}
-          </div>
-
-          {/* Description (middle) */}
-          {!isDesign && (
-            <div
-              className="absolute left-0 right-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center"
-              style={{
-                top: `${height * infoAreaRatio * scale}px`,
-                height: `${descAreaH * scale}px`,
-                fontSize: `${titleFontSize * scale}px`,
-                lineHeight: 1.2,
-                display: '-webkit-box',
-                WebkitLineClamp: descMaxLines,
-                WebkitBoxOrient: 'vertical',
-                overflowWrap: 'break-word',
-                wordBreak: 'normal',
-              }}
-            >
-              {data.itemDescription || '—'}
-            </div>
-          )}
-
-          {/* Barcode (bottom) */}
-          <div
-            className="absolute left-0 right-0 bottom-0 flex flex-col items-center justify-center"
-            style={{
-              top: `${(height * infoAreaRatio + descAreaH) * scale}px`,
-              padding: `${2 * scale}px ${1 * scale}px`,
-            }}
-          >
-            {barcodeUrl ? (
-              <img
-                src={barcodeUrl}
-                alt="barcode"
-                style={{ width: '80%', height: '100%', objectFit: isLargeFormat ? 'contain' : 'fill' }}
-              />
-            ) : (
-              <div
-                className="flex items-center justify-center text-muted-foreground border border-dashed border-border"
-                style={{ width: '80%', height: '80%', fontSize: `${baseFontSize * scale * 0.7}px` }}
-              >
-                [barcode]
-              </div>
             )}
           </div>
 
