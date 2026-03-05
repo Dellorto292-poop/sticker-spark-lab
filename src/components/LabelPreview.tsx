@@ -73,30 +73,10 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             '--print-scale-y': `${(height * 3.7795) / scaledH}`,
           } as React.CSSProperties}
         >
-          {/* Description (top) */}
-          {!isDesign && (
-            <div
-              className="absolute left-0 right-0 top-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center"
-              style={{
-                height: `${descAreaH * scale}px`,
-                fontSize: `${titleFontSize * scale}px`,
-                lineHeight: 1.2,
-                display: '-webkit-box',
-                WebkitLineClamp: descMaxLines,
-                WebkitBoxOrient: 'vertical',
-                overflowWrap: 'break-word',
-                wordBreak: 'normal',
-              }}
-            >
-              {data.itemDescription || '—'}
-            </div>
-          )}
-
-          {/* Info row (after description, above barcode) — SKU / REV / QTY */}
+          {/* Info row (top) — SKU / REV / QTY */}
           <div
-            className="absolute left-0 right-0 flex"
+            className="absolute left-0 right-0 top-0 flex"
             style={{
-              top: `${descAreaH * scale}px`,
               height: `${height * infoAreaRatio * scale}px`,
             }}
           >
@@ -141,11 +121,31 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             )}
           </div>
 
+          {/* Description (middle) */}
+          {!isDesign && (
+            <div
+              className="absolute left-0 right-0 px-[4%] pt-[2%] leading-tight font-bold overflow-hidden text-center"
+              style={{
+                top: `${height * infoAreaRatio * scale}px`,
+                height: `${descAreaH * scale}px`,
+                fontSize: `${titleFontSize * scale}px`,
+                lineHeight: 1.2,
+                display: '-webkit-box',
+                WebkitLineClamp: descMaxLines,
+                WebkitBoxOrient: 'vertical',
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
+              }}
+            >
+              {data.itemDescription || '—'}
+            </div>
+          )}
+
           {/* Barcode (bottom) */}
           <div
             className="absolute left-0 right-0 bottom-0 flex flex-col items-center justify-center"
             style={{
-              top: `${(descAreaH + height * infoAreaRatio) * scale}px`,
+              top: `${(height * infoAreaRatio + descAreaH) * scale}px`,
               padding: `${2 * scale}px ${1 * scale}px`,
             }}
           >
