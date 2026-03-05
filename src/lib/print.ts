@@ -50,11 +50,11 @@ export async function printLabel(data: LabelData): Promise<void> {
     `).join('');
   } else {
     infoHtml = `
-      <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:2%; padding:0 3%;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">SKU</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.sku || '—')}</div>
       </div>
-      <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:2%; padding:0 3%;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">Rev.</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.revision || '—')}</div>
       </div>
@@ -72,19 +72,19 @@ export async function printLabel(data: LabelData): Promise<void> {
     html, body { width:${width}mm; height:${height}mm; margin:0; padding:0; }
     body { font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; color:#000; background:#fff; }
     .label { position:relative; width:${width}mm; height:${height}mm; overflow:hidden; }
-    .info { position:absolute; top:0; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
-    .desc { position:absolute; top:${height * infoAreaRatio}mm; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
-    .barcode { position:absolute; top:${height * infoAreaRatio + descAreaH}mm; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
+    .desc { position:absolute; top:0; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
+    .barcode { position:absolute; top:${descAreaH}mm; bottom:${height * infoAreaRatio}mm; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
+    .info { position:absolute; bottom:0; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
     .barcode img { width:80%; height:100%; object-fit:${isLargeFormat ? 'contain' : 'fill'}; }
   </style>
 </head>
 <body>
   <div class="label">
     ${!isDesign ? `<div class="desc">${escapeHtml(data.itemDescription || '—')}</div>` : ''}
-    <div class="info">${infoHtml}</div>
     <div class="barcode">
       ${barcodeDataUrl ? `<img src="${barcodeDataUrl}" alt="barcode">` : '<div>[barcode]</div>'}
     </div>
+    <div class="info">${infoHtml}</div>
   </div>
   <script>
     Promise.all([document.fonts.ready,...Array.from(document.images).map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r;}))]).then(()=>{setTimeout(()=>{window.print();window.close();},200);});
