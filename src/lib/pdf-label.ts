@@ -128,10 +128,11 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
     // Revision barcode under REV value
     if (data.revision) {
-      const revBcW = colW * 0.85;
-      const revBcH = infoH * 0.45;
+      const revBottomPadMm = 0.5;
+      const revBcW = colW * 0.92;
+      const revBcH = Math.max(infoH * 0.45 - revBottomPadMm, 1);
       const revBcX = revCx - revBcW / 2;
-      const revBcY = infoTop + infoH * 0.55;
+      const revBcY = infoTop + infoH - revBcH - revBottomPadMm;
       const revEncoded = encodeBarcode(data.revision, data.barcodeType);
       drawBarcode(pdf, revEncoded, revBcX, revBcY, revBcW, revBcH);
     }
