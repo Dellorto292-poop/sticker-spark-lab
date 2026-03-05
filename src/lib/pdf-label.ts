@@ -4,7 +4,6 @@ import { encodeBarcode, type BarcodeBars } from './barcode-encoder';
 
 const MM_TO_PT = 72 / 25.4;
 
-// ── Font loading (Cyrillic support) ──
 let fontBase64Cache: string | null = null;
 
 async function loadCyrillicFont(): Promise<string> {
@@ -43,8 +42,7 @@ export function defaultGridConfig(labelW: number, labelH: number): GridConfig {
 }
 
 /**
- * Draw a single label at (x, y) in mm coordinates on the given jsPDF instance.
- * Layout: Description → Info row (SKU/REV/QTY) → Barcode. No borders.
+ * Draw a single label at (x, y). Layout: Description → Barcode → Info row. No borders.
  */
 function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const { width: w, height: h } = data.size;
@@ -60,7 +58,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const descH = h * descRatio;
   const infoH = h * infoRatio;
 
-  // ── Description area (skip for design template) ──
+  // ── Description ──
   if (!isDesign) {
     const descLen = Math.max((data.itemDescription || '—').length, 1);
     const descAreaW = w * 0.92;
@@ -75,7 +73,6 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     const titleFontMm = Math.max(minFont, Math.min(maxFontH, maxFontW, h * (isLarge ? 0.04 : 0.1)));
     const titleFontPt = titleFontMm * MM_TO_PT;
 
-    // Use Helvetica for readability
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(titleFontPt);
 
@@ -91,8 +88,22 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     }
   }
 
-  // ── Info row (SKU / REV / QTY) ──
-  const infoTop = y + descH;
+  // ── Barcode (middle, 80% width) ──
+  const barcodeAreaH = h - descH - infoH;
+  const barcodeTop = y + descH;
+  const bcPadV = 2;
+  const bcPadH = w * 0.1;
+  const bcAreaH = barcodeAreaH - bcPadV * 2;
+  const bcAreaW = w - bcPadH * 2;
+  const bcX0 = x + bcPadH;
+
+  if (data.sku) {
+    const encoded = encodeBarcode(data.sku, data.barcodeType);
+    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
+  }
+
+  // ── Info row (bottom) ──
+  const infoTop = y + h - infoH;
   const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
   const labelFontScale = isCompactFormat ? 0.4 : 0.5;
   const valueFontScale = isCompactFormat ? 0.7 : 0.85;
@@ -123,7 +134,6 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     const valueFontPt = baseFontMm * valueFontScale * MM_TO_PT;
     const halfW = w / 2;
 
-    // SKU
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(labelFontPt);
     pdf.setTextColor(120);
@@ -135,7 +145,6 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     pdf.setTextColor(0);
     pdf.text(data.sku || '—', skuLabelX + skuLabelW, midY);
 
-    // Rev.
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(labelFontPt);
     pdf.setTextColor(120);
@@ -148,29 +157,13 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     pdf.text(data.revision || '—', revLabelX + revLabelW, midY);
   }
 
-  // ── Barcode (vector, narrower width ~80%) ──
-  const barcodeAreaH = h - descH - infoH;
-  const barcodeTop = y + descH + infoH;
-  const bcPadV = 2;
-  const bcPadH = w * 0.1; // 10% margin each side → 80% width
-  const bcAreaH = barcodeAreaH - bcPadV * 2;
-  const bcAreaW = w - bcPadH * 2;
-  const bcX0 = x + bcPadH;
-
-  if (data.sku) {
-    const encoded = encodeBarcode(data.sku, data.barcodeType);
-    drawBarcode(pdf, encoded, bcX0, barcodeTop + bcPadV, bcAreaW, bcAreaH);
-  }
-
   pdf.setTextColor(0);
 }
 
 function drawBarcode(pdf: jsPDF, encoded: BarcodeBars, x: number, y: number, areaW: number, areaH: number): void {
   if (encoded.bars.length === 0 || encoded.totalWidth === 0) return;
-
   const scale = areaW / encoded.totalWidth;
   pdf.setFillColor('#000000');
-
   for (const bar of encoded.bars) {
     const bx = x + bar.x * scale;
     const bw = bar.w * scale;
@@ -178,101 +171,55 @@ function drawBarcode(pdf: jsPDF, encoded: BarcodeBars, x: number, y: number, are
   }
 }
 
-/**
- * Open a popup window with the label as HTML (exact mm dimensions),
- * set @page size to match, and trigger window.print().
- * Window is opened synchronously to avoid popup blocker.
- */
 export async function generateThermalPdf(data: LabelData): Promise<void> {
   const { width, height } = data.size;
-
   const printWindow = window.open('', '_blank', `width=${Math.max(width * 4, 400)},height=${Math.max(height * 4, 400)}`);
-  if (!printWindow) {
-    await downloadVectorPdf(data);
-    return;
-  }
+  if (!printWindow) { await downloadVectorPdf(data); return; }
 
-  const pdf = new jsPDF({
-    orientation: width > height ? 'landscape' : 'portrait',
-    unit: 'mm',
-    format: [width, height],
-  });
-
+  const pdf = new jsPDF({ orientation: width > height ? 'landscape' : 'portrait', unit: 'mm', format: [width, height] });
   const fontBase64 = await loadCyrillicFont();
   registerFont(pdf, fontBase64);
-
   drawLabel(pdf, 0, 0, data);
 
   const blobUrl = pdf.output('bloburl') as unknown as string;
-
-  if (typeof blobUrl !== 'string' || !blobUrl.startsWith('blob:')) {
-    printWindow.close();
-    throw new Error('Invalid PDF blob URL');
-  }
+  if (typeof blobUrl !== 'string' || !blobUrl.startsWith('blob:')) { printWindow.close(); throw new Error('Invalid PDF blob URL'); }
 
   const doc = printWindow.document;
   doc.open();
   doc.write('<!DOCTYPE html><html><head><title>Label</title></head><body></body></html>');
   doc.close();
-
   const style = doc.createElement('style');
   style.textContent = '*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}iframe{width:100%;height:100%;border:none}';
   doc.head.appendChild(style);
-
   const iframe = doc.createElement('iframe');
   iframe.setAttribute('id', 'pf');
   iframe.src = blobUrl;
-  iframe.onload = () => {
-    try { iframe.contentWindow?.print(); } catch { printWindow.print(); }
-  };
+  iframe.onload = () => { try { iframe.contentWindow?.print(); } catch { printWindow.print(); } };
   doc.body.appendChild(iframe);
 }
 
-/**
- * Generate a vector PDF on A4 with a grid of labels.
- */
 export async function generateA4GridPdf(data: LabelData, config: GridConfig): Promise<void> {
   const { cols, rows, hGapMm, vGapMm, marginMm } = config;
   const { width: lw, height: lh } = data.size;
-
-  const pdf = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-  });
-
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const fontBase64 = await loadCyrillicFont();
   registerFont(pdf, fontBase64);
-
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const lx = marginMm + col * (lw + hGapMm);
       const ly = marginMm + row * (lh + vGapMm);
-
       if (lx + lw > 210 - marginMm + 0.5 || ly + lh > 297 - marginMm + 0.5) continue;
-
       drawLabel(pdf, lx, ly, data);
     }
   }
-
   pdf.save(`${data.sku || 'label'}-a4-grid.pdf`);
 }
 
-/**
- * Download a vector PDF (single label on label-sized page).
- */
 export async function downloadVectorPdf(data: LabelData): Promise<void> {
   const { width, height } = data.size;
-
-  const pdf = new jsPDF({
-    orientation: width > height ? 'landscape' : 'portrait',
-    unit: 'mm',
-    format: [width, height],
-  });
-
+  const pdf = new jsPDF({ orientation: width > height ? 'landscape' : 'portrait', unit: 'mm', format: [width, height] });
   const fontBase64 = await loadCyrillicFont();
   registerFont(pdf, fontBase64);
-
   drawLabel(pdf, 0, 0, data);
   pdf.save(`${data.sku || 'label'}.pdf`);
 }
