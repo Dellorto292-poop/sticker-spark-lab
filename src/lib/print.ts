@@ -72,9 +72,9 @@ export async function printLabel(data: LabelData): Promise<void> {
     html, body { width:${width}mm; height:${height}mm; margin:0; padding:0; }
     body { font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; color:#000; background:#fff; }
     .label { position:relative; width:${width}mm; height:${height}mm; overflow:hidden; }
-    .desc { position:absolute; top:0; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
-    .info { position:absolute; top:${descAreaH}mm; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
-    .barcode { position:absolute; top:${descAreaH + height * infoAreaRatio}mm; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
+    .info { position:absolute; top:0; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
+    .desc { position:absolute; top:${height * infoAreaRatio}mm; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
+    .barcode { position:absolute; top:${height * infoAreaRatio + descAreaH}mm; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
     .barcode img { width:80%; height:100%; object-fit:${isLargeFormat ? 'contain' : 'fill'}; }
   </style>
 </head>

@@ -58,7 +58,13 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
   const descH = h * descRatio;
   const infoH = h * infoRatio;
 
-  // ── Description ──
+  // ── Info row (top) ──
+  const infoTop = y;
+  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
+  const labelFontScale = isCompactFormat ? 0.4 : 0.5;
+  const valueFontScale = isCompactFormat ? 0.7 : 0.85;
+
+  // ── Description (after info row) ──
   if (!isDesign) {
     const descLen = Math.max((data.itemDescription || '—').length, 1);
     const descAreaW = w * 0.92;
@@ -76,23 +82,18 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(titleFontPt);
 
+    const descTop = y + infoH;
     const text = data.itemDescription || '—';
     const lines = pdf.splitTextToSize(text, descAreaW);
     const clampedLines = lines.slice(0, maxLines);
     const lineH = titleFontMm * 1.3;
     const textBlockH = clampedLines.length * lineH;
-    const textStartY = y + (descH - textBlockH) / 2 + titleFontMm;
+    const textStartY = descTop + (descH - textBlockH) / 2 + titleFontMm;
 
     for (let i = 0; i < clampedLines.length; i++) {
       pdf.text(clampedLines[i], x + w / 2, textStartY + i * lineH, { align: 'center' });
     }
   }
-
-  // ── Info row (after description, above barcode) ──
-  const infoTop = y + descH;
-  const baseFontMm = isLarge ? Math.max(h * 0.04, 6) : Math.max(h * 0.1, 2.2);
-  const labelFontScale = isCompactFormat ? 0.4 : 0.5;
-  const valueFontScale = isCompactFormat ? 0.7 : 0.85;
 
   if (isBox) {
     const qtyLabel = data.qtyType === 'pallet' ? 'PALLET QTY' : data.qtyType === 'set' ? 'SET QTY' : 'BOX QTY';
@@ -145,7 +146,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
   // ── Barcode (bottom, 80% width) ──
   const barcodeAreaH = h - descH - infoH;
-  const barcodeTop = y + descH + infoH;
+  const barcodeTop = y + infoH + descH;
   const bcPadV = 2;
   const bcPadH = w * 0.1;
   const bcAreaH = barcodeAreaH - bcPadV * 2;
