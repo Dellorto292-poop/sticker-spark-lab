@@ -16,8 +16,8 @@ export async function printLabel(data: LabelData): Promise<void> {
 
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   const infoAreaRatio = isBoxTemplate
-    ? (isLargeFormat ? 0.15 : (isCompactFormat ? 0.24 : 0.18))
-    : (isLargeFormat ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
+    ? (isLargeFormat ? 0.18 : (isCompactFormat ? 0.28 : 0.22))
+    : (isLargeFormat ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
 
   const fontSize = isLargeFormat ? Math.max(height * 0.04, 6) : Math.max(height * 0.08, 2);
   const descAreaH = height * descAreaRatio;

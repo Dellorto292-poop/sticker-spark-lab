@@ -53,8 +53,8 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
   const descRatio = isDesign ? 0 : (isLarge ? 0.25 : 0.24);
   const infoRatio = isBox
-    ? (isLarge ? 0.15 : (isCompactFormat ? 0.24 : 0.18))
-    : (isLarge ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
+    ? (isLarge ? 0.18 : (isCompactFormat ? 0.28 : 0.22))
+    : (isLarge ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
   const descH = h * descRatio;
   const infoH = h * infoRatio;
 

@@ -32,8 +32,8 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
   const descAreaRatio = isDesign ? 0 : (isLargeFormat ? 0.25 : 0.24);
   const infoAreaRatio = isBoxTemplate
-    ? (isLargeFormat ? 0.15 : (isCompactFormat ? 0.24 : 0.18))
-    : (isLargeFormat ? 0.10 : (isCompactFormat ? 0.16 : 0.12));
+    ? (isLargeFormat ? 0.18 : (isCompactFormat ? 0.28 : 0.22))
+    : (isLargeFormat ? 0.13 : (isCompactFormat ? 0.20 : 0.16));
 
   // Description font sizing
   const descLen = Math.max(data.itemDescription.length, 1);
