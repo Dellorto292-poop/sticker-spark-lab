@@ -73,18 +73,18 @@ export async function printLabel(data: LabelData): Promise<void> {
     body { font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; color:#000; background:#fff; }
     .label { position:relative; width:${width}mm; height:${height}mm; overflow:hidden; }
     .desc { position:absolute; top:0; left:0; right:0; height:${descAreaH}mm; padding:2% 4%; font-size:${titleFontSize}mm; font-weight:bold; line-height:1.2; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:${descMaxLines}; -webkit-box-orient:vertical; overflow-wrap:break-word; }
-    .barcode { position:absolute; top:${descAreaH}mm; bottom:${height * infoAreaRatio}mm; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
+    .info { position:absolute; top:${descAreaH}mm; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
+    .barcode { position:absolute; top:${descAreaH + height * infoAreaRatio}mm; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:2mm 1mm; }
     .barcode img { width:80%; height:100%; object-fit:${isLargeFormat ? 'contain' : 'fill'}; }
-    .info { position:absolute; bottom:0; left:0; right:0; height:${height * infoAreaRatio}mm; display:flex; }
   </style>
 </head>
 <body>
   <div class="label">
     ${!isDesign ? `<div class="desc">${escapeHtml(data.itemDescription || '—')}</div>` : ''}
+    <div class="info">${infoHtml}</div>
     <div class="barcode">
       ${barcodeDataUrl ? `<img src="${barcodeDataUrl}" alt="barcode">` : '<div>[barcode]</div>'}
     </div>
-    <div class="info">${infoHtml}</div>
   </div>
   <script>
     Promise.all([document.fonts.ready,...Array.from(document.images).map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r;}))]).then(()=>{setTimeout(()=>{window.print();window.close();},200);});
