@@ -121,7 +121,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
       const cx = x + i * colW + colW / 2;
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(baseFontMm * labelFontScale * MM_TO_PT);
-      pdf.setTextColor(120);
+      pdf.setTextColor(0);
       pdf.text(cols[i].label, cx, infoTop + infoH * 0.35, { align: 'center' });
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(baseFontMm * valueFontScale * MM_TO_PT);
@@ -136,7 +136,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(labelFontPt);
-    pdf.setTextColor(120);
+    pdf.setTextColor(0);
     const skuLabelW = pdf.getTextWidth('SKU ');
     const skuLabelX = x + halfW * 0.15;
     pdf.text('SKU', skuLabelX, midY);
@@ -147,7 +147,7 @@ function drawLabel(pdf: jsPDF, x: number, y: number, data: LabelData): void {
 
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(labelFontPt);
-    pdf.setTextColor(120);
+    pdf.setTextColor(0);
     const revLabelW = pdf.getTextWidth('Rev. ');
     const revLabelX = x + halfW + halfW * 0.15;
     pdf.text('Rev.', revLabelX, midY);

@@ -44,18 +44,18 @@ export async function printLabel(data: LabelData): Promise<void> {
     ];
     infoHtml = cols.map((col) => `
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; opacity:0.5; text-transform:uppercase; white-space:nowrap;">${col.label}</div>
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">${col.label}</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${col.value}</div>
       </div>
     `).join('');
   } else {
     infoHtml = `
       <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:2%; padding:0 3%;">
-        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; opacity:0.5; text-transform:uppercase; white-space:nowrap;">SKU</div>
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">SKU</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.sku || '—')}</div>
       </div>
       <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:2%; padding:0 3%;">
-        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; opacity:0.5; text-transform:uppercase; white-space:nowrap;">Rev.</div>
+        <div style="font-size:${fontSize * 0.5}mm; font-weight:600; text-transform:uppercase; white-space:nowrap;">Rev.</div>
         <div style="font-size:${fontSize * 0.85}mm; font-weight:bold;">${escapeHtml(data.revision || '—')}</div>
       </div>
     `;

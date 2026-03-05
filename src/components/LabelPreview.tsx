@@ -125,19 +125,19 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             {isBoxTemplate ? (
               <>
                 <div className="flex-1 flex flex-col items-center justify-center leading-none">
-                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, opacity: 0.5, lineHeight: 1 }}>SKU</div>
+                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>SKU</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.sku || '—'}
                   </div>
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center leading-none">
-                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, opacity: 0.5, lineHeight: 1 }}>Rev.</div>
+                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>Rev.</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
                     {data.revision || '—'}
                   </div>
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center leading-none">
-                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, opacity: 0.5, lineHeight: 1 }}>
+                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>
                     {qtyLabel}
                   </div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1.1 }}>
@@ -148,13 +148,13 @@ const LabelPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             ) : (
               <>
                 <div className="flex-1 flex items-center justify-center gap-[2%] leading-none px-[3%]">
-                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, opacity: 0.5, lineHeight: 1 }}>SKU</div>
+                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>SKU</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1 }}>
                     {data.sku || '—'}
                   </div>
                 </div>
                 <div className="flex-1 flex items-center justify-center gap-[2%] leading-none px-[3%]">
-                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, opacity: 0.5, lineHeight: 1 }}>Rev.</div>
+                  <div className="uppercase whitespace-nowrap font-semibold" style={{ fontSize: `${baseFontSize * scale * labelScale}px`, lineHeight: 1 }}>Rev.</div>
                   <div className="font-bold" style={{ fontSize: `${baseFontSize * scale * valueScale}px`, lineHeight: 1 }}>
                     {data.revision || '—'}
                   </div>
